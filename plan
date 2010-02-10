@@ -1,0 +1,21 @@
+Preparing for Marbles - Project plan
+
+Starting date - 8/2 2010
+
+Ending date - 9/7 2010
+
+Total time: 22 weeks
+
+Week 1 - Initial planning, making of this project plan, reading of articles
+and other previously produced materials. Addressing of initial design issues
+such as methods of dealing with multiple inheritance.
+
+Week 2-4 - Further design and prototyping. Investigation into 'taxonomies'
+of different formal devices involving trees, cf. Loek Cleophas thesis.
+
+Week 5-10 - Definition and implementation of basic internal interfaces, basic
+design work for the UI.
+
+Week 10-15 - Implementation of concrete classes, building a simplistic GUI.
+
+Week 16-22 - Wrapping up and writing a proper report

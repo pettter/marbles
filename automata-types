@@ -1,0 +1,24 @@
+Transducers: type < tree -> tree >
+TD-transducer
+BU-transducer
+MTT (OI/IO) (maybe a BU variant as well, just because..)
+Restrictions on above: deterministic/total/
+
+Different kinds of rewrite systems
+
+Automata/language: type < tree -> bool/semifield >
+FTA (BU/TD/Other kinds?)
+modifiers: Deterministic/nondeterministic, total,
+	weighted/probabilistic/other restrictions
+
+Grammar/language: type < () -> treeset >
+RTG
+CFTG
+Again, rewrite systems of some sort, e.g. L-systems
+
+
+Is there a 'canonical form' for an RTL? Is it an automaton or a grammar?
+Neither?
+
+
+

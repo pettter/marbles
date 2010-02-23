@@ -1,0 +1,19 @@
+Week 6
+
+Topic title: A prototype of the Tree Automata Workbench MARBLES
+
+Much of the early week was spent on general design principles, and getting
+a proper 'feel' for the scope of the project. The typing system proposed in
+the paper was found to be insufficient, so alternatives were investigated.
+In the end, it was decided that a further investigation into the various
+constructs that need to be represented was required.
+
+In general, it was thought that most of the class AUT (i.e. various
+algorithms handling automata) could be seen as generalised tree
+transducers, with grammars going from the empty tree to a class of trees,
+and automata going from a tree to the tree itself, or to the empty tree (if
+the tree is rejected).
+
+A general pattern of these transducers would be some kind of tree walker,
+combined with a 'visitor', which together would walk all over the input
+tree, computing the output tree.

@@ -2,6 +2,8 @@ Transducers: type < tree -> tree >
 TD-transducer
 BU-transducer
 MTT (OI/IO) (maybe a BU variant as well, just because..)
+Attributed TT (Also BU?)
+Macro Attributed TT
 Restrictions on above: deterministic/total/
 
 Different kinds of rewrite systems
@@ -11,7 +13,7 @@ FTA (BU/TD/Other kinds?)
 modifiers: Deterministic/nondeterministic, total,
 	weighted/probabilistic/other restrictions
 
-Grammar/language: type < () -> treeset >
+Grammar/language: type < () -> treeset/iterator<tree>e >
 RTG
 CFTG
 Again, rewrite systems of some sort, e.g. L-systems

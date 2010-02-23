@@ -1,0 +1,15 @@
+Week 7
+
+Unfortunately, not a very productive week. Quite a few articles were
+skimmed or read, in search of a suitable superclass for tree transducers
+and automata, but it is not clear if anything was found. Multi-return macro
+tree transducers (possibly with attributes) seem like the best bet for now,
+but a more general approach (with both top-down and bottom-up as special
+cases) would be preferrable.
+
+Brink has an idea about modelling transducers/automata as a tree-walker and
+some kind of patterns applied at each step. To me, it feels as if it could
+be too general, in some sense, but I am unsure.
+
+This week will hopefully include some actual program design and setup of
+the development environment.

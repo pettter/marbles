@@ -1,0 +1,11 @@
+Week 10
+
+Last week was hot and unproductive. Basic automata were implemented in
+Scala, which is very suited for that kind of thing. In principle, the
+ruleset can be directly written as a Scala PartialFunction, but some
+alternative representation should probably be used to ease introspection of
+formal devices.
+
+This week will focus on more implementation and design issues. A general
+implementation of automata and transducers will be a priority, as well as
+some algorithms working on same.

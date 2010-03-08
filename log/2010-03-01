@@ -1,0 +1,13 @@
+Week 8 - Learning Scala
+
+Scala indeed seems like an ideal language for the task, with many many
+abstractions useful in the project. The plan for now is to use Scala
+internally, and expose java interfaces to be implemented in client code.
+
+Extractor/injector patterns is a good example of a nice, usable construct,
+as are case classes, traits and the multiple inheritance given by same.
+
+Plans for next week is to implement a few basic classes, such as trees,
+automata etc. in Scala, both to get a better feel for the language and
+because those constructs will surely be needed.
+

@@ -23,4 +23,13 @@ Is there a 'canonical form' for an RTL? Is it an automaton or a grammar?
 Neither?
 
 
+Proposed hierarchy
+
+modules:
+	basetypes (containing simple types, such as trees, semirings, etc.)
+	automata (containing automata on simple types, transducers, generators etc.)
+	algorithms (containing algorithms on automata and/or simple types etc.)
+	gui (the gui related classes)
+	
+	
 

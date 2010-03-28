@@ -1,0 +1,19 @@
+Week ??
+
+Kept reading up on various automata formalisms. Restricting the weighted
+variants to fields makes computation simpler, especially when using
+nondeterminism. However, this excludes the Boolean case, opting instead for
+the field of two elements (xor automata) in order to get an additive
+inverse of 1/true.
+
+Whether the Boolean semiring is an interesting field of study is a
+different question, but for many operations on deterministic automata (e.g.
+union, intersection etc.), building the standard nondeterministic
+automaton is much simpler than moving to the field of two elements. A
+reasonable approach is to extend residual finite-state automata for strings
+to the case of trees, using trees and contexts instead of pre- and suffixes
+in the standard way.
+
+However, as I am in Sweden, this week will see a bit of focus on finishing
+the actual specification and project plan, as well as getting something to
+show for the Marbles implementation.

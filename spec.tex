@@ -1,0 +1,65 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[english]{babel,varioref}
+\usepackage[T1]{fontenc}
+\usepackage{epsfig,fancyhdr,verbatim}
+\pagenumbering{arabic}
+
+\section{Background}
+
+The theory of formal tree languages is a rapidly evolving field of
+research, with applications ranging from microcode optimisation in
+compilers to translation of natural languages. The basis of the field is
+the theory of formal languages as made popular by Chomsky, but instead of
+working on strings of symbols, the data is structured as \emph{trees},
+where a tree is defined as a root symbol with a (finite) number of
+\emph{subtrees}.
+
+This class of structure turns out to be a reasonable way of representing
+many types of structured and semistructured data, as shown for example by
+the wide use of XML for data transfer applications. XML files repesent what
+is called \emph{unranked} trees. That is to say, any node may have any
+number of subtrees, regardless of the symbol at that node. This is
+contrasted by the \emph{ranked} trees, where each symbol in the alphabet
+has a \emph{rank} denoting the number of subtrees of every tree rooted by
+that symbol.
+
+\section{Motivation}
+
+As mentioned above, research into various tree language and tree transducer
+formalisms and applications is a very active field. However, development of
+proof-of-concept code and applications of implemented algorithms to related
+formalisms are hampered by the lack of a general framework for working with
+trees and tree formalisms. Many specific programming tools exist, for many
+different domains, but are often overly focused on a specific domain or
+formalism, excluding potential research into related areas.
+
+Hence, the need for a generalised programming framework for working with
+trees and various tree formalisms in a simple and straightforward manner.
+In \cite{marbles}, the basic design ideas for such a framework is proposed,
+and the reasonings in this and the previous sections are stated in an
+extended and much clearer manner.
+
+\section{Specification}
+
+The goal of the thesis is to produce a prototype of the framework, not a
+complete implementation. Even so, an investigation into various classes of
+tree formalisms to be represented should be made, so as to have the
+information necessary to make reasonable choices for various implementation
+details.
+
+That is, the project can be divided into two conceptually distinct
+activities; investigating the current state of research into tree
+automata/tree formalisms of various sorts, and implementing a prototype of
+the Marbles system with regard to the information gathered.
+
+In particular, the prototype should
+\begin{itemize}
+\item work, as in be usable for at least one task that the full system
+should cover,
+\item include a concrete formulation of the concepts described in
+\cite{marbles}, focusing on the implementation of same, and 
+\item compose these into a reasonable architecture for the complete system,
+	although it is likely this will serve more as a basis for discussion
+	than as a foundation for the final version of the framework.
+\end{itemize}
+

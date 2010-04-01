@@ -1,0 +1,13 @@
+Week 11 - Diversion
+
+I diverted some time into reading up on various nondeterministic learning
+methods related to the MAT model, due to a possible article being written
+by Brink and Jacu. Also, the representations are in many parts based on
+linear algebra techniques, which will be useful in any efficient
+implementation in Marbles.
+
+At the moment, I am stuck trying to understand multilinear functions in an
+intuitive way, which to me is very hard. Hopefully, I will be able to
+understand it somewhat during the beginning of next week, and could
+potentially get something done before leaving for Sweden.
+

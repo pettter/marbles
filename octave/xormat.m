@@ -55,7 +55,7 @@ function [I,A,F,d] = lacc(I,A,F)
 		q = a++;
 	    for ix = 1:length(A(1,1,:))
 			v = A(q,:,ix);
-			jt = lastzero(v)
+			jt = lastzero(v);
 			if(jt >= b)
 				[I,A,F] = Simi(b,jt,v,I,A,F);b++;
 			end
@@ -76,8 +76,6 @@ function [I,A,F,d] = minNXA(I,A,F)
 	[I,A,F,d] = lacc(It,At,Ft)
 	It = F';
 	Ft = I';
-	size(A)
-	size(At)
 	for ix = 1:length(A(1,1,:))
 		At(:,:,ix) = A(:,:,ix)';
 	end

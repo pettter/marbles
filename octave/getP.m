@@ -10,4 +10,4 @@ function P = getP(it,jt,v)
 	P(:,jt) = t;
 end
 
-function [Ir,Ar,Fr] = Simi(it,jt,v,I,A,F)
+%function [Ir,Ar,Fr] = Simi(it,jt,v,I,A,F)

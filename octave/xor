@@ -1,0 +1,98 @@
+# Created by Octave 3.0.1, Fri Apr 02 15:47:38 2010 SAST <pettter@zebrahest>
+# name: A
+# type: matrix
+# ndims: 3
+ 6 6 2
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 1
+ 0
+ 0
+ 0
+ 1
+# name: F
+# type: matrix
+# rows: 6
+# columns: 1
+ 0
+ 0
+ 1
+ 0
+ 1
+ 1
+# name: I
+# type: matrix
+# rows: 1
+# columns: 6
+ 1 0 0 0 0 0
+# name: __nargin__
+# type: scalar
+0
+# name: ans
+# type: scalar
+0

@@ -1,0 +1,8 @@
+Last week was spent implementing and refining transducer splitting. For
+now, implementation efforts will focus on finishing regular tree
+grammars/automata as examples of the generator/recogniser groups of tree
+automata. After that, parsers and graphical components will begin to be
+included, probably similarily as to how Treebag is constructed.
+
+After parsing is complete for the basic components, weights will be
+introduced properly. 

@@ -1,0 +1,10 @@
+Automata/regognisers are complete, while grammars have been put on hold for
+a time, seeing how they are more difficult to view as 'functions'. Parsing
+has been looked at as well, and determined to be more complex than a casual
+glance would indicate. Specifically, inheritance of 'static' methods such
+as parse(String/Stream) is not really possible in Scala. Instead, the
+companion object is used.
+
+Some theory and reading is required before starting off. Some was done last
+week, the rest will be done this week, whereafter, again, parsing will be
+the focus.

@@ -1,0 +1,12 @@
+Last week was spent keeping at the parsing problem, and finally, a solution
+was found by using the outer 'ElementParsers' class for basically shipping
+around the inner 'Parser' class, and using an implicit conversion to get
+the ElementParsers to each and every different internal Parser.
+
+After that, most of the time was spent implementing various parsers. At the
+moment, the most glaring omissions are a) grammars and b) weights. Also,
+some time has been spent on trying to comment at least the general outline
+of the code.
+
+The issue at hand is to keep creating parsers, and also creating a useable
+system for weighted automata and the handling of those.

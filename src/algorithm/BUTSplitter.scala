@@ -4,13 +4,20 @@ import marbles.util._
 import marbles.automaton.BUTreeTransducer
 import marbles.automaton.TDTreeTransducer
 
+/** An algorithm for splitting a Bottom-Up Tree Transducer into two
+ *  Top-Down Tree Transducers which implement the same function.
+ */ 
+
 class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
+
+	// The alphabet of right-hand sides of the bu transducer
 	private val treeAlpha = (new RankedAlphabet(
 					(for(rhs <- but.rules.values; 
 						v <- rhs) 
 					yield (v._1, v._1.rank)) toMap)
 				)
-	val rel:TDTreeTransducer[F,OrderedVarTree[T]] = //Relabeling
+
+	val rel:TDTreeTransducer[F,VarTree[T]] = //Relabeling
 		new TDTreeTransducer(
 				but.sigma, // Same input alphabet obviously
 				treeAlpha, // Right hand sides as 'state markers'
@@ -23,12 +30,12 @@ class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 					(
 						(sym,state),
 						// Note: tree is the root of a height-1 tree
-						(OrderedVarTree(tree,tree.rank),states.zipWithIndex)
+						(VarTree(tree,tree.rank),states.zipWithIndex)
 					)) groupBy (_._1) map ({case (lhs,rhss) => 
-						(lhs,(rhss map(_._2)) toSet)}),
+						(lhs,(rhss map(_._2)) toSet)}) toMap, //TODO: groupBy fix can result in removing toMap
 				but.fin	// Final states is equivalent to initial states	
 			)
-	val hom:TDTreeTransducer[OrderedVarTree[T],T] = //Homomorphism
+	val hom:TDTreeTransducer[VarTree[T],T] = //Homomorphism
 		new TDTreeTransducer(
 				treeAlpha, // Output from relabeling is input for this
 				but.delta, // While output is output from the original
@@ -41,6 +48,6 @@ class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 
 	val output = (rel,hom)
 	
-	def apply():(marbles.automaton.TDTreeTransducer[F,OrderedVarTree[T]],TDTreeTransducer[OrderedVarTree[T],T]) = (rel,hom);
+	def apply():(marbles.automaton.TDTreeTransducer[F,VarTree[T]],TDTreeTransducer[VarTree[T],T]) = (rel,hom);
 	
 }

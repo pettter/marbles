@@ -2,9 +2,10 @@ package marbles.algorithm
 
 import marbles.util._
 import marbles.automaton._
-//import marbles.automaton.TDTreeTransducer
-//import marbles.automaton.BUTreeTransducer
 
+/** An algorithm for splitting a Top-Down Tree Transducer into two
+ *  Bottom-Up transducers implementing the same function
+ */
 class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 	
 	val maxCopy = ((for(
@@ -26,10 +27,10 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		// Rules copy each subtree maxCopy times, 'exploding' the tree
 		(for(sym:F <- tdt.sigma.map.keys) yield (
 			(sym,Seq.fill(nSigma(sym))("q")),
-			Set((new OrderedVarTree(Right(sym),(
+			Set((new VarTree(Right(sym),(
 				(for(i <- 0 until tdt.sigma(sym);
 					j <- 0 until maxCopy) yield
-					new OrderedVarTree[F](Left(Variable(i)),Nil)))),
+					new VarTree[F](Left(Variable(i)),Nil)))),
 			 "q")))) toMap,
 		Set("q") // a single, final state
 	)
@@ -49,13 +50,13 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 
 	private def mangleIndices(ixs:Seq[(String,Int)]):(Map[
 			 		Either[Variable,T],
-					OrderedVarTree[T]],
+					VarTree[T]],
 				Map[Int,String]) = {
 		val tuples = mangleIndices(ixs,Map(),0)
 		val (varmap,statemap) = (tuples map { 
 			case (oldindex,state,newindex) => (
 				(Left(Variable(oldindex)),
-				 OrderedVarTree(Left(Variable(newindex)),Nil):OrderedVarTree[T]
+				 VarTree(Left(Variable(newindex)),Nil):VarTree[T]
 				),
 				(newindex,state)
 			)
@@ -111,7 +112,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		  // and sigma may not be of the same type, meaning that making a
 		  // single leaf node from delta is better. These trees will never
 		  // show up in the end result of the transducer.
-		  (OrderedVarTree(tdt.delta.leaves.head,0),""))).toList ++
+		  (VarTree(tdt.delta.leaves.head,0),""))).toList ++
 		// Now for the proper rules 
 		(for(((sym,state), pairs ) <- tdt.rules.toList;// Split up each rule
 			 ( tree      , stsixs) <- pairs) yield {
@@ -140,7 +141,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 							statemap.getOrElse(ix,"")
 			((sym,states),(t,state))
 		})) groupBy (_._1) map ({ case (lhs,rhss) =>
-   			(lhs,(rhss map (_._2)) toSet)}),
+   			(lhs,(rhss map (_._2)) toSet)}) toMap, //TODO: groupBy fix can result in removing toMap
 		tdt.q0
 	)
 

@@ -84,8 +84,7 @@ object TDTreeTransducer {
 			// left-hand side in a set.
 			def rules:Parser[Map[(F,String),Set[(VarTree[T],Seq[(String,Int)])]]]
 			   	= rep(rule) ^^ (x => x groupBy (_._1) map ({ case
-						(lhs, rhss) => (lhs,(rhss map (_._2)) toSet)})
-						toMap) //TODO: groupBy fix can result in removing toMap
+						(lhs, rhss) => (lhs,(rhss map (_._2)) toSet)}))
 
 			// Putting it all together to parse a complete TD transducer
 			def tdtrans = alpha~
@@ -193,8 +192,7 @@ object BUTreeTransducer {
 			// We need to group all the right-hand sides sharing the same
 			// left-hand side into sets.
 			def rules = rep(rule) ^^ (x => x groupBy (_._1) map ({ case
-						(lhs, rhss) => (lhs,(rhss map (_._2)) toSet)})
-					    toMap) //TODO: groupBy fix can result in removing toMap
+						(lhs, rhss) => (lhs,(rhss map (_._2)) toSet)})) 
 
 			// Putting it all together to parse a complete bu transducer
 			def butrans = alpha~

@@ -32,7 +32,7 @@ class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 						// Note: tree is the root of a height-1 tree
 						(VarTree(tree,tree.rank),states.zipWithIndex)
 					)) groupBy (_._1) map ({case (lhs,rhss) => 
-						(lhs,(rhss map(_._2)) toSet)}) toMap, //TODO: groupBy fix can result in removing toMap
+						(lhs,(rhss map(_._2)) toSet)}) , 
 				but.fin	// Final states is equivalent to initial states	
 			)
 	val hom:TDTreeTransducer[VarTree[T],T] = //Homomorphism

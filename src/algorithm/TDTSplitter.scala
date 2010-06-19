@@ -141,7 +141,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 							statemap.getOrElse(ix,"")
 			((sym,states),(t,state))
 		})) groupBy (_._1) map ({ case (lhs,rhss) =>
-   			(lhs,(rhss map (_._2)) toSet)}) toMap, //TODO: groupBy fix can result in removing toMap
+   			(lhs,(rhss map (_._2)) toSet)}), 
 		tdt.q0
 	)
 

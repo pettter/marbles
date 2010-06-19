@@ -1,0 +1,9 @@
+Last week was spent on trying to get the parsing to work, but no such luck.
+Various approaches were tried, but none seemed to fit nicely into the
+combinator parser framework already in place. Alternatively, the approach
+fit into the framework, but was unusable or faulty in some other way. I
+will continue trying to get something working out of it, in the worst case
+I will have to write it all myself, but that should hopefully not be
+necessary.
+
+

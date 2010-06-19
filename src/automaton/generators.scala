@@ -1,12 +1,12 @@
 package marbles
 package automaton
 
-trait TreeGrammar[T]
-	extends Traversable[T]
-
-
+//trait TreeGrammar[T]
+//	extends Traversable[Tree[T]]
+//
+//
 //class RegularTreeGrammar[T](
-//		sigma:Alphabet[T],
+//		sigma:RankedAlphabet[T],
 //		nonterminals:Alphabet[String]
 //		)	extends TreeGrammar[T] {
 //	

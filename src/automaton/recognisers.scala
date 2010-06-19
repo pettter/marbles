@@ -66,8 +66,7 @@ class BUNFTA[T](val sigma:RankedAlphabet[T],
 				val states:Set[String],
 				val rules:Map[(T,Seq[String]),Set[String]],
 				val fin:Set[String]
-		)
-	    extends NFTA[T]{
+		) extends NFTA[T] {
 
 	override def toString:String = {
 		var ret:StringBuilder = new StringBuilder( 
@@ -142,7 +141,7 @@ object TDNFTA {
 						rep(rule) ^^ ((x:Seq[((T,String),Seq[String])]) => 
 								x.groupBy(_._1) map ({ 
 									case (lhs, rhss) => (lhs,(rhss map (_._2)) toSet)
-								}) toMap) //TODO: groupBy fix can result in removing toMap
+								})) 
 
 			// Parser for the complete tdnfta
 			def tdnfta = alpha~
@@ -207,7 +206,122 @@ class TDNFTA[T](sigma:RankedAlphabet[T],
 }
 
 
-abstract class WFTA[T,R >: Semiring] extends TreeAutomaton[T,R] {
+abstract class WFTA[T,R <% Semiring[R]] extends TreeAutomaton[T,R] {
+
 }
 
 
+/** The class of Bottom-Up Nondeterministic Weighted Tree Automata
+ */
+class BUWFTA[T,R <% Semiring[R]](
+				val sigma:RankedAlphabet[T],
+				val states:Set[String],
+				val rules:Map[T,Map[Seq[String],Set[(String,Seq[R])]]],
+				//val rules:Map[(T,Seq[String]),Set[(String,R)]],
+				// Rules could be represented as vectors.
+				val fin:Map[String,R]
+		) extends WFTA[T,R]{
+
+	private val rFactory = fin.values.head.factory
+	
+	override def toString:String = {
+		var ret:StringBuilder = new StringBuilder( 
+		  "Sigma       : "+sigma+
+		"\nStates      : "+states+
+		"\nRules       :\n")
+		rules foreach {case (lhs,rhs) => ret.append("    "+lhs+" | "+rhs+"\n")}
+		ret.append("\nFinal states: "+fin)
+		ret.toString
+	}
+	/** A BUNFTA is a function determining whether a tree is in the
+	 *  language specified by the automaton or not
+	 */
+	def apply(tree:Tree[T]):R = {
+		val swmap = applyState(tree)
+		(for(sym <- fin.keys) yield {
+				fin(sym) * swmap.getOrElse(sym,rFactory.zero)
+			}) reduceLeft ((x,y) => x + y)
+	}
+	
+	private def helper(rhss:Set[(String,Seq[R])],
+				       weights:Seq[R]
+				):Seq[(String,R)] = (for((state,coeffs) <- rhss toList) yield 
+						//val weight:R = 
+						(state,((weights zip coeffs).map(
+							(t) => t._1 * t._2
+						)).reduceLeft(
+							(x,y) => x + y
+						))) 
+						//(state,weight)
+
+
+	private def getPairs(rulemap:Map[Seq[String],Set[(String,Seq[R])]],
+						 stateseqs:Set[Seq[(String,R)]]			 
+			):Seq[(String,R)] = {
+		val pre:Seq[(Seq[String],Seq[R])] = stateseqs.map(_.unzip).toList;
+		(for((states,weights) <- pre) yield {
+			rulemap.get(states) match {
+				case None => Nil;
+				case Some(rhss) => (for((state,coeffs) <- rhss.toList) yield 
+						//val weight:R = 
+						(state,((weights zip coeffs).map(
+							(t) => t._1 * t._2
+						)).reduceLeft(
+							(x,y) => x + y
+						))) 
+						//(state,weight)
+//helper(rhss,weights)
+			}
+		}).flatten
+	}
+			
+		
+//
+//
+//		((for(pairs <- stateseqs) yield {
+//				val (states,weights) = pairs unzip;
+//				(rulemap.get(states) match {
+//					case None => Nil
+//					case Some(rhss) => (for((state,coeffs) <- rhss) yield {
+//						val weight:R =((weights zip coeffs).map(
+//								{case (x,y) => x * y}).reduceLeft(
+//									(x,y) => x + y));
+//						(state,weight)
+//					})
+//				})
+////				for ((state,coeffs) <- rulemap(states)) yield 
+////					(state,((weights zip coeffs) map {case (x,y) => x * y})
+////					 reduceLeft ((x,y) => x + y))
+//			}).flatten)
+//	}
+
+
+	/** A helper function, returning what states the automaton is in after
+	 *  processing the tree considered
+	 */
+	def applyState(tree:Tree[T]):Map[String,R] = {
+		val rulemap:Map[Seq[String],Set[(String,Seq[R])]] = rules(tree.root);
+		//val premob:Seq[Set[(String,R)]] = (tree.subtrees map applyState) map (_.toSet);
+		val stateseqs:Set[Seq[(String,R)]] = Util.cartSet((tree.subtrees map applyState) map (_.toSet))
+		val respairs:Seq[(String,R)] = //getPairs(rulemap,stateseqs)
+			((for(pairs <- stateseqs.toList) yield {
+				val (states,weights) = pairs unzip;
+				(rulemap.get(states) match {
+					case None => Nil
+					case Some(rhss) => (for((state,coeffs) <- rhss.toList) yield {
+						val weight:R =((weights zip coeffs).map(
+								{case (x,y) => x * y}).reduceLeft(
+									(x,y) => x + y));
+						(state,weight)
+					})
+				})
+			}).flatten)
+		(respairs.groupBy(_._1) map { case (lhs,rhss) =>
+   			(lhs,(rhss map (_._2)) reduceLeft ((x,y) => x + y))}).toMap
+	}
+
+	/** The tree can be considered by the automaton if it conforms to the
+	 *  alphabet.
+	 */
+	def isDefinedAt(tree:Tree[T]):Boolean = sigma.verifyTree(tree)
+}

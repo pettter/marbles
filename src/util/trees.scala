@@ -23,6 +23,10 @@ object Tree {
 	 */
 	def apply[T](rt:T,ss:Seq[Tree[T]]) = new Tree(rt,ss)
 	
+	/** Factory for leaves
+	 */
+	def apply[T](rt:T) = new Tree(rt,Nil)
+	
 	/** A parser for trees on the form "root[tree,...]" or "root" if the
 	 *  tree is a leaf. 
 	 */

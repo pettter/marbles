@@ -30,17 +30,14 @@ object Util {
  *  implicits for easy access
  */
 object ElementParsers extends JavaTokenParsers {
-	
 
-
-//	// Everything but characters used to denote trees, variables and
-//	// weights are valid to use in a generalised string
 	/** A standard string is any sequence of characters not 'reserved' for
 	 *  use in trees and/or sets/variables
 	 */
 	implicit def nonTreeParsers:ElementParsers[String] = new ElementParsers[String] { 
 		def start = nonTreeParser
 	}
+
 	/** Standard parser for floating point numbers
 	 */
 	implicit def numParsers:ElementParsers[Double] = new ElementParsers[Double] {
@@ -101,7 +98,6 @@ abstract class ElementParsers[T] extends JavaTokenParsers {
 	implicit def elementParsersToParser[U](ep:ElementParsers[U]):Parser[U] = 
 		ep.start.asInstanceOf[Parser[U]]
 	
-
 	/** The parser for the eventual resulting object. Must be defined in
 	 *  any concrete subclass
 	 */
@@ -132,5 +128,3 @@ abstract class ElementParsers[T] extends JavaTokenParsers {
 	def parseObj(in:java.io.Reader):Option[T] =
 		parseObj(new PagedSeqReader(PagedSeq.fromReader(in)))
 }
-
-

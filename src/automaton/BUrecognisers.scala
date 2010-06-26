@@ -48,10 +48,7 @@ object BUNFTA {
 							BUNFTA[T](sigma,stateset,ruleset,finals)
 						 }
 			def start = bunfta
-
-
 		}
-
 }
 
 /** The class of Bottom-Up Nondeterministic Tree Automata
@@ -180,8 +177,7 @@ class BUWFTA[T,R <% Semiring[R]](
 		ret.append("\nFinal states: "+fin)
 		ret.toString
 	}
-	/** A BUNFTA is a function determining whether a tree is in the
-	 *  language specified by the automaton or not
+	/** A BUWFTA is a function determining the weight of a specific tree.
 	 */
 	def apply(tree:Tree[T]):R = {
 		val swmap = applyState(tree)
@@ -198,13 +194,11 @@ class BUWFTA[T,R <% Semiring[R]](
 				  weights match {
 					case Nil => (state,coeffs head)
 					case _ => (state,((weights zip coeffs).map(
-							(t) => t._1 * t._2
+							(t)   => t._1 * t._2
 						)).reduceLeft(
 							(x,y) => x + y
 						))
 				  }
-						 
-
 
 	/** A helper function, returning the state-to-weight map the automaton is in after
 	 *  processing the tree considered

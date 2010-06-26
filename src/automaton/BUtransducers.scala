@@ -112,8 +112,10 @@ class WBUTreeTransducer[F,T,R <: Semiring[R]](
 	   val sigma:RankedAlphabet[F],
    	   val delta:RankedAlphabet[T],
 	   val states:Set[String], //Should possibly be parameterised as well
-	   val rules:Map[(F,Seq[String]),Set[(VarTree[T],String,Seq[R])]],
-	   val fin:Set[(String,R)]) extends TreeTransducer[F,T] {
+	   val rules:Map[F,Map[Seq[String],Set[(VarTree[T],String,Seq[R])]]],
+	   val fin:Map[String,R]) extends TreeTransducer[F,T] {
+
+	private val rFactory = fin.values.head.factory
 
 	override def toString:String = {
 		var ret:StringBuilder = new StringBuilder( 
@@ -128,7 +130,7 @@ class WBUTreeTransducer[F,T,R <: Semiring[R]](
 
 	/** Get the tree/state pairs resulting from the input tree.
 	 */
-	def applyState(t : Tree[F]):Set[(Tree[T],String)] = {
+	def applyState(t : Tree[F]):Map[Tree[T],Set[(String,R)]] = {
 		val pairs = Util.cartSet(t.subtrees map applyState)
 		(for((trees,states) <- pairs map (_.unzip) if rules.isDefinedAt(t.root,states) ;
 			(vtree,state) <- rules(t.root,states)) yield 
@@ -137,8 +139,11 @@ class WBUTreeTransducer[F,T,R <: Semiring[R]](
 
 	/** Get the output trees determined by the input tree
 	 */
-	def apply(tree:Tree[F]):Set[(Tree[T],R)] = { 
-		(for((t,s) <- applyState(tree) if fin contains s) yield t) toSet
+	def apply(tree:Tree[F]):Set[(Tree[T],R)] = {
+		val 
+		(for(sym <- fin.keys) yield {
+		 	fin(sym= * swmap.getOrElse(sym,rFactory.zero)
+			}) reduceLeft ((x,y) => x + y)
 	}
 
 	/** The transducer is defined for a tree conforming to the input

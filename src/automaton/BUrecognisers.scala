@@ -161,7 +161,6 @@ class BUWFTA[T,R <% Semiring[R]](
 				val sigma:RankedAlphabet[T],
 				val states:Set[String],
 				val rules:Map[T,Map[Seq[String],Set[(String,Seq[R])]]],
-				//val rules:Map[(T,Seq[String]),Set[(String,R)]],
 				// Rules could be represented as vectors.
 				val fin:Map[String,R]
 		) extends WFTA[T,R]{
@@ -180,7 +179,7 @@ class BUWFTA[T,R <% Semiring[R]](
 	/** A BUWFTA is a function determining the weight of a specific tree.
 	 */
 	def apply(tree:Tree[T]):R = {
-		val swmap = applyState(tree)
+		val swmap = applyState(tree).toMap
 		(for(sym <- fin.keys) yield {
 				fin(sym) * swmap.getOrElse(sym,rFactory.zero)
 			}) reduceLeft ((x,y) => x + y)
@@ -192,7 +191,7 @@ class BUWFTA[T,R <% Semiring[R]](
 				         weights:Seq[R]
 				):Seq[(String,R)] = for((state,coeffs) <- rhss toList) yield 
 				  weights match {
-					case Nil => (state,coeffs head)
+					case Nil => (state,coeffs head) //Leaf
 					case _ => (state,((weights zip coeffs).map(
 							(t)   => t._1 * t._2
 						)).reduceLeft(
@@ -203,13 +202,13 @@ class BUWFTA[T,R <% Semiring[R]](
 	/** A helper function, returning the state-to-weight map the automaton is in after
 	 *  processing the tree considered
 	 */
-	def applyState(tree:Tree[T]):Map[String,R] = {
+	def applyState(tree:Tree[T]):Set[(String,R)] = {
 		// This is the subgroup of the rules that we need to consider on
 		// this tree
 		val rulemap:Map[Seq[String],Set[(String,Seq[R])]] = rules(tree.root);
 		// Get the possible combinations of state/weight sequences from
 		// nondeterministically processing the subtrees
-		val stateseqs:Set[Seq[(String,R)]] = Util.cartSet((tree.subtrees map applyState) map (_.toSet))
+		val stateseqs:Set[Seq[(String,R)]] = Util.cartSet(tree.subtrees map applyState)
 		// Loop over the state/weight sequences and get all the resulting
 		// weights from the getPairs helper function. Finish by flattening
 		// it all into a single list instead of a list of lists
@@ -226,7 +225,7 @@ class BUWFTA[T,R <% Semiring[R]](
 		// and every right-hand side is the sum of the right-hand sides
 		// associated with that left-hand side in the original list.
 		(respairs.groupBy(_._1) map { case (lhs,rhss) =>
-   			(lhs,(rhss map (_._2)) reduceLeft ((x,y) => x + y))}).toMap
+   			(lhs,(rhss map (_._2)) reduceLeft ((x,y) => x + y))}).toSet
 	}
 
 	/** The tree can be considered by the automaton if it conforms to the

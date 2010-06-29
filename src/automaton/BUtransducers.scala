@@ -106,14 +106,14 @@ class BUTreeTransducer[F,T](
 }
 
 
-/** A Weighted Bottom-Up Tree Transducer from F to T
+/** A Bottom-Up Weighted Tree Transducer from F to T
  */ 
-class WBUTreeTransducer[F,T,R <: Semiring[R]](
+class BUWTreeTransducer[F,T,R <: Semiring[R]](
 	   val sigma:RankedAlphabet[F],
    	   val delta:RankedAlphabet[T],
 	   val states:Set[String], //Should possibly be parameterised as well
 	   val rules:Map[F,Map[Seq[String],Set[(VarTree[T],String,Seq[R])]]],
-	   val fin:Map[String,R]) extends TreeTransducer[F,T] {
+	   val fin:Map[String,R]) extends WTreeTransducer[F,T,R] {
 
 	private val rFactory = fin.values.head.factory
 
@@ -128,22 +128,56 @@ class WBUTreeTransducer[F,T,R <: Semiring[R]](
 		ret.toString
 	}
 
-	/** Get the tree/state pairs resulting from the input tree.
+	private def getTriples(rhss:Set[(VarTree[T],String,Seq[R])],
+						   weights:Seq[R],
+						   trees:Seq[Tree[T]]):Seq[(String,R,Tree[T])] = {
+		for((vtree,state,coeffs) <- rhss toList) yield
+			weights match {
+				case Nil => (state,coeffs head,vtree subAll Nil)
+				case _   => (state,
+							((weights zip coeffs).map(
+								(t) => t._1 * t._2
+							)).reduceLeft(
+								(x,y) => x + y
+							),
+							vtree subAll trees)
+		}
+	}
+
+
+	/** Get the tree/state/weight triples resulting from the input tree.
 	 */
-	def applyState(t : Tree[F]):Map[Tree[T],Set[(String,R)]] = {
-		val pairs = Util.cartSet(t.subtrees map applyState)
-		(for((trees,states) <- pairs map (_.unzip) if rules.isDefinedAt(t.root,states) ;
-			(vtree,state) <- rules(t.root,states)) yield 
-				(vtree subAll trees,state)) toSet
+	def applyState(t : Tree[F]):Set[(String,R,Tree[T])] = {
+		// This is the subgroup of the rules that we need to consider on
+		// this tree 
+		val rulemap:Map[Seq[String],Set[(VarTree[T],String,Seq[R])]] = rules(t.root);
+		// The combinations of tree/state/weight triple sequences possible
+		// given the subtrees
+		val seqs:Set[Seq[(String,R,Tree[T])]] = Util.cartSet(t.subtrees map applyState)
+		val restriples:Seq[(String,R,Tree[T])] =
+			(for(triples <- seqs toList) yield {
+				// Woo 3 traversals...
+				val (states,weights,trees) = (triples map(_._1),triples map(_._2),triples map(_._3));
+				rulemap.get(states) match {
+					case None => Nil
+					case Some(rhss) => getTriples(rhss,weights,trees)
+				}
+			}).flatten
+
+		(restriples.groupBy(x => (x._1,x._3)) map { case ((st,t),rhss) =>
+   			(st,(rhss map (_._2)) reduceLeft ((x,y) => x + y),t)}).toSet
 	}
 
 	/** Get the output trees determined by the input tree
 	 */
 	def apply(tree:Tree[F]):Set[(Tree[T],R)] = {
-		val 
-		(for(sym <- fin.keys) yield {
-		 	fin(sym= * swmap.getOrElse(sym,rFactory.zero)
-			}) reduceLeft ((x,y) => x + y)
+		val tmap = applyState(tree) groupBy (_._3)
+		(for(tree <- tmap.keys) yield {
+		 	val swmap:Map[String,R] = tmap(tree).map(x => (x._1,x._2))toMap;
+		 	(tree,(for(sym <- fin.keys) yield {
+		 	fin(sym) * swmap.getOrElse(sym,rFactory.zero)
+			}) reduceLeft ((x,y) => x + y))
+		}).toSet
 	}
 
 	/** The transducer is defined for a tree conforming to the input

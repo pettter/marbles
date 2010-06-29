@@ -13,7 +13,7 @@ trait TreeTransducer[F,T] {
 //	def currentTree:Tree[Any]
 }
 
-trait WTreeTransducer[F,T,R <: Semiring[R] {
+trait WTreeTransducer[F,T,R <: Semiring[R]] {
 	def apply(a:Tree[F]):Set[(Tree[T],R)]
 }
 

@@ -137,3 +137,55 @@ class TDTreeTransducer[F,T](
 	 */
 	def isDefinedAt( t : Tree[F]):Boolean = sigma.verifyTree(t)
 }
+
+
+
+/** A Top-Down Weighted Tree Transducer from F to T
+ */
+class TDWTreeTransducer[F,T,R <: Semiring[R]](
+	   val sigma:RankedAlphabet[F],
+   	   val delta:RankedAlphabet[T],
+	   val states:Set[String], //Should possibly be parameterised as well
+	   val rules:Map[(F,String),Set[(VarTree[T],Seq[(String,R,Int)])]],
+	   val q0:Set[(String,R)]) extends AnyRef with WTreeTransducer[F,T,R] {
+	
+	override def toString:String = {
+		var ret:StringBuilder = new StringBuilder( 
+		  "Sigma         : "+sigma+
+		"\nDelta         : "+delta+
+		"\nStates        : "+states+
+		"\nInitial states: "+q0+
+		"\nRules         :\n")
+		rules foreach {case (lhs,rhs) => ret.append("    "+lhs+" => "+rhs+"\n")}
+		ret.toString
+	}
+
+	/** Get the trees resulting from processing the input tree starting in
+	 *  state q
+	 */
+	def applyState(q : String, w : R,tree : Tree[F]):Set[(Tree[T],R)] ={
+		val rhs = rules(tree.root,q)
+		for(
+			 (t,triples) <- rhs; // Triples of index/coeff/state to process and
+			 				   // insert into the output tree t
+			 (treeseq) <- Util.cartSet( // Take every valid combination of
+				 			(triples map  // subtrees
+							 	{ case (st,c,ix) =>
+					 				(st,c,tree.subtrees(ix)) 
+					 			}) map (x => applyState(x._1,x._2*w,x._3))
+							)
+		   ) yield {
+			val (trees,ws) = treeseq.unzip;
+			(t.subAll(trees),ws.reduceLeft((x,y) => x + y)) // And build a new tree for each of them
+		}
+	}
+
+	/** Get the trees resulting from processing the input tree
+	 */
+	def apply(t:Tree[F]):Set[(Tree[T],R)] = 
+			(for((q,w) <- q0) yield applyState(q,w,t)).flatten
+
+	/** A tree has a defined output if it conforms to the input alphabet
+	 */
+	def isDefinedAt( t : Tree[F]):Boolean = sigma.verifyTree(t)
+}

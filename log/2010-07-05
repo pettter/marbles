@@ -1,0 +1,5 @@
+Tree transducers were implemented, which brought their own quirks and
+problems into the fray. It is remarkable how little code is actually needed
+at this stage to implement these concepts, though. Further work could
+decrease the amount of code duplication even more, and make adding
+functionality to the current object classes even easier.

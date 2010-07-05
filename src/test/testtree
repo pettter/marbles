@@ -1,0 +1,4 @@
+val tree = new OrderedTree('c',Seq(
+	new OrderedTree('b',Seq(
+		new OrderedTree('b',Seq(new OrderedTree('a',Nil))))),
+	new OrderedTree('b',Seq(new OrderedTree('a',Nil)))))

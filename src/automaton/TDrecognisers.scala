@@ -9,7 +9,7 @@ object TDNFTA {
 	/** Parser for TDNFTAs. The format is
 	 * {sym,...}   //Alphabet
 	 * {state,...} //States
-	 * sym|state | [state,...]
+	 * sym|state| [state,...]
 	 * ...
 	 * {initialstate,...}
 	 * In contrast to the BU version, there can be several lines with the

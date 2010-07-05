@@ -1,0 +1,10 @@
+Mostly, this week was spent implementing weighted automata. Surprisingly,
+this went rather well, with both bottom-up and top-down automata completed,
+as well as a number of different semirings. Some difficulties were
+encountered with regards to how the result of a weighted automaton should
+be computed, but careful thought and consideration resulted in an algorithm
+which should be correct.
+
+In general, much of the complexities stems from the fact that as much of
+the code as possible is written in a functional style, as many of the
+algorithms in literature are not described as such.

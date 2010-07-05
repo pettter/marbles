@@ -6,6 +6,14 @@ import marbles.util._
  */ 
 object BUTreeTransducer {
 	/** Parser for BU Tree Transducers from F to T
+	 *  The format is
+	 * {isym,...}   //Input alphabet
+	 * {osym,...}   //Output alphabet
+	 * {state,...} //States
+	 * sym[state,...] | state|vtree
+	 * WHERE vtree = outp[vtree OR {subtreeindex},...]
+	 * ...
+	 * {finalstate,...}
 	 */
 	def BUTTParsers[F,T](implicit fps:ElementParsers[F],
 			                      tps:ElementParsers[T]) = 
@@ -105,6 +113,95 @@ class BUTreeTransducer[F,T](
 
 }
 
+/** Companion object of the Bottom-Up Weighted Tree Transducer class.
+ *  Contains parser and factory methods.
+ */ 
+object BUWTreeTransducer {
+	/** Parser for BUW Tree Transducers from F to T over semiring R
+	 *  The format is
+	 * {isym,...}   //Input alphabet
+	 * {osym,...}   //Output alphabet
+	 * {state,...} //States
+	 * isym[state,...] | state[coeff,...]|vtree
+	 * WHERE vtree = osym[vtree OR {subtreeindex},...]
+	 * OR isym|state[weight]|otree
+	 * ...
+	 * {finalstate[coeff,...],...}
+	 */
+	def BUWTTParsers[F,T,R <: Semiring[R]](
+			             implicit fps:ElementParsers[F],
+			                      tps:ElementParsers[T],
+								  rps:ElementParsers[R]) = 
+		new ElementParsers[BUWTreeTransducer[F,T,R]] {
+			// Parser for input symbols
+			val tp:Parser[T] = tps
+			// Parser for output symbols
+			val fp:Parser[F] = fps
+			// Parser for weights/coefficients
+			val rp:Parser[R] = rps
+			// Parser for variable trees
+			val vp:Parser[VarTree[T]] = VarTree.varTreeParser[T](tps)
+			// Parser for the input alphabet
+			def alpha:Parser[RankedAlphabet[F]] = 
+				"{"~>RankedAlphabet.alphaParsers[F](fps)<~"}"
+			// Parser for the output alphabet
+			def beta:Parser[RankedAlphabet[T]] = 
+				"{"~>RankedAlphabet.alphaParsers[T](tps)<~"}"
+			// A state is a string
+			def state:Parser[String] = nonTreeParser
+			// Parser for a set of states
+			def states:Parser[Set[String]] = 
+					"{"~>repsep(state,",")<~"}" ^^ (_.toSet)
+			// A state with weights
+			def stweight:Parser[(String,Seq[R])] = 
+				state~"["~repsep(rp,",")~"]" ^^ {
+					case st~"["~ws~"]" => (st,ws)
+				}
+			// A set of states with weights
+			def stweights:Parser[Set[(String,Seq[R])]] = 
+					"{"~>repsep(stweight,",")<~"}" ^^ (_.toSet)
+			// The left-hand side of a rule is an input symbol and a
+			// sequence of states corresponding to the subtrees of that
+			// input symbol
+			def lhs:Parser[(F,Seq[String])] = 
+					fp~opt("["~>repsep(state,",")<~"]") ^^ {
+						case sym~Some(sts) => (sym,sts)
+						case sym~None => (sym,Nil)
+					}
+			// The right-hand side of a rule is a state and a variable
+			// tree, separated by a |
+			def rhs = stweight~"|"~vp ^^ {case (st,ws)~"|"~tr => (tr,st,ws)}
+			def rhss = "{"~>repsep(rhs,",")<~"}" ^^ (_.toSet)
+			// A rule is a left-hand side and a right-hand side
+			def rule = lhs~"|"~rhss ^^ {case lh~"|"~rh => (lh,rh)}
+			// We need to group all the right-hand sides sharing the same
+			// left-hand side into sets.
+			def rules = rep(rule) ^^ (_.groupBy (_._1._1) map { 
+							case (sym, tups) => (sym,(tups map {
+								case ((_,states),rhss) => (states,rhss)
+							}) toMap)
+						})
+
+			def finals = stweights ^^ (x => (x.map {
+					case (st,ws) => (st,ws head)
+				}).toMap)
+			// Putting it all together to parse a complete bu transducer
+			def buwtrans = alpha~
+						 beta~
+						 states~
+						 rules~
+						 finals ^^ {
+						 case (sigma~delta~stateset~ruleset~finals) => new
+							BUWTreeTransducer[F,T,R](sigma,delta,stateset,ruleset,finals)
+						 }
+			// Setting the defaul parser to be the complete transducer
+			// parser
+			def start = buwtrans
+
+
+		}
+
+}
 
 /** A Bottom-Up Weighted Tree Transducer from F to T
  */ 

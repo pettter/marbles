@@ -1,0 +1,4 @@
+Parsers for the weighted automata were implemented and tested this week,
+with associated hang-ups, bugs and problems. Mostly straightforward work,
+although it uncovered some bugs and oversights in the code for actual
+weighted automata. Test cases were drawn up and seem to work properly.

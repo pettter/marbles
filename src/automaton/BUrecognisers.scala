@@ -133,7 +133,7 @@ object BUWFTA {
 			// Repeating a number of rules, and making a map out of them
 			def rules = rep(rule) ^^ (_.groupBy(_._1._1) map {
 				case (sym,tups) => (sym,(tups map {
-						case ((sym,states),rhss) => (states,rhss)
+						case ((_,states),rhss) => (states,rhss)
 					}) toMap) 
 			})
 

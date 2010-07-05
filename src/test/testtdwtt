@@ -1,0 +1,13 @@
+{a|0,b|0,f|2,g|1}
+{e|0,c|2,d|1}
+{qcopy,qid}
+a|qcopy|e|1.0
+a|qid|e|1.0
+b|qcopy|e|1.0
+b|qid|e|1.0
+g|qid|d[d[{qid|1.0|0}]]
+g|qid|d[c[{qcopy|1.0|0},{qcopy|1.0|0}]]
+g|qcopy|c[c[{qcopy|1.0|0},{qcopy|1.0|0}]]
+f|qid|c[d[{qcopy|1.0|0}],d[{qid|1.0|1}]]
+f|qcopy|c[c[{qcopy|1.0|0}],d[{qcopy|1.0|1}],c[{qid|1.0|0}],d[{qid|1.0|1}]]
+{qid|1.0,qcopy|1.0}

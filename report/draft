@@ -6,27 +6,84 @@ Format of report
 
 Introduction to subject
 
+  * Theory of tree languages, specifically grammatical inference
+  * Situation in usable software (refer to Marbles paper)
+  * Areas of use
+
 Introduction to problem
+
+  * Grammatical inference of tree languages is hard but possible
+  * Software for working with tree languages and tree automata is
+    special-purpose
+  * Little work done in performance of various inference algorithms
 
 What is treebag?
 
+  * Software for working with trees and operations on trees
+  * Can generate and transform trees in various ways, as well as interpret
+    them using various algebras
+  * Written by Frank Drewes in Java	
+
 What will Marbles be?
+
+  * Software for working with tree automata and operations on tree
+    automata, as well as on trees
+  * Closer to a general-purpose library than treebag
+  * More advanced typing than Java can supply would be useful
 
 What the project consisted of
 
+  * Grandiose plans for large prototype including GUI and Java interface
+    with reflection etc. etc.
+  * A comparative study of various grammatical inference algorithms and how
+    they perform on various languages
+
 Method adopted
+
+  * Read up on what should be included and what should not.
+  * Decide on a reasonable language to use
+  * Start designing a reasonable architecture
+  * Implement a 'large enough' subset to start experiments
+  * Implement various learning algorithms
+  * Experiment on algorithms
 
 Problems encountered
 
+(hoo boy, where to start...)
+
+  * In general, things took longer than expected
+  * In addition, motivation was lacking at times
+  * Further troubles included
+  	* Several weeks of learning Scala, including choosing the right version
+	  to use
+	* Picking apart complex typing bugs, ending up suggesting (and getting
+	  through) an admittedly minor change to the standard Scala library
+	* Understanding the combinator parser library of Scala, and extending
+	  it to work as intended for the purposes of the project
+	* Translating the usual imperative algortihms of various articles into
+	  somewhat functional equivalents
+
 Resulting code
+
+  * 2kloc of mostly basic stuff
 
 How the code can be used
 
+  * The current code is definietly usable as a base for further work.
+  * 
+
 Comparison of learning algos...
+
+  * Has not been done
 
 Conclusions
 
+  * 
+
 Future work
+
+  * Oh dear god so much :((
 
 Acknowledgements
 
+  * Frank, Brink, Hanna, Tove, Johan, McElory

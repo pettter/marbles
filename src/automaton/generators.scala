@@ -1,8 +1,8 @@
 package marbles
 package automaton
 
-//trait TreeGrammar[T]
-//	extends Traversable[Tree[T]]
+trait TreeGrammar[T]
+	extends Iterator[Tree[T]]
 //
 //
 //class RegularTreeGrammar[T](

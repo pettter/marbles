@@ -1,0 +1,25 @@
+\makeatletter
+
+\newcommand{\inputchapter}[1]{%
+  \bgroup
+	\newpage
+	{\pagestyle{empty}\cleardoublepage}
+	\subimport*{#1/}{main}
+  \egroup
+}
+
+\renewcommand*\l@section[2]{%
+  \ifnum \c@tocdepth >\z@
+    \addpenalty\@secpenalty
+%    \addvspace{.2em \@plus\p@}%
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \normalfont
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\dotfill\ \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+    \endgroup
+  \fi}
+\makeatother

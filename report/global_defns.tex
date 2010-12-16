@@ -1,0 +1,90 @@
+%% Global definitions to be kept in all contributions.
+%% Do not modify this file!!!
+
+\newcommand{\powerset}{\wp}       % Power set of a set
+\newcommand{\nat}{\mathbb N}      % The set of nonnegative integers
+\newcommand{\posnat}{\nat_+}      % The set of positive integers
+
+\parskip 3pt
+\parindent 0pt
+\def\arraystretch{1.1}
+
+\makeatletter
+\def\renewcounter#1{%
+  \@ifundefined{c@#1}
+    {\@latex@error{counter #1 undefined}\@ehc}%
+  \relax
+  \let\@ifdefinable\@rc@ifdefinable
+  \@ifnextchar[{\@newctr{#1}}{}
+}
+\newcounter {chapter}
+\renewcounter {section}[chapter]
+\renewcounter {subsection}[section]
+
+\let\localinput\input  % Use this command to include LaTeX files
+
+\renewcommand{\title}[1]{%
+  \refstepcounter{chapter}
+  \global\edef\@thetitle{#1}%
+}
+\renewcommand{\author}[1]{%
+  \bgroup
+    \def\and{ and }
+    \global\edef\@theauthors{#1}%
+  \egroup
+}
+
+\let\abstract\undefined
+
+\renewcommand{\maketitle}{%
+  \vspace*{\bigskipamount}
+  \bgroup
+    \begin{flushright}
+      \sffamily\bfseries\LARGE
+      C\textsmaller[2]{HAPTER}~\thechapter
+      \bigskip\par
+	  \Huge\@thetitle
+	  \par
+	  \smallskip
+	  \Large
+	  by \@theauthors
+    \end{flushright}
+  \egroup
+  \vspace{1cm}  \addtocontents{toc}{\protect\@lectheading{\thechapter}{\@thetitle}{\@theauthors}}%
+}
+
+\newcommand{\@lectheading}[3]{%
+  \vspace{2\bigskipamount}\par
+  \hbox to \linewidth{\hspace*{\fill}Chapter #1\hspace*{\fill}}\nopagebreak\vspace{\smallskipamount}\nopagebreak\par\nopagebreak
+  \hbox to \linewidth{\hspace*{\fill}\bfseries #2\hspace*{\fill}}\nopagebreak\par\nopagebreak
+  \hbox to \linewidth{\hspace*{\fill}\bfseries by #3\hspace*{\fill}}\nopagebreak\par\nopagebreak
+}%
+
+\newtheorem{theorem}{Theorem}[chapter]
+\renewcommand \thetheorem {\@arabic\c@theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{observation}[theorem]{Observation}
+\theorembodyfont{\normalfont}
+\newtheorem{example}[theorem]{Example}
+
+\newenvironment{named}[1]{%
+  \par\smallskip\noindent\textbf{#1}}{%
+  \par\medskip}
+
+\newenvironment{proof}{\textit{Proof}\quad}{\bigskip}
+\newcommand{\qed}{\quad\hspace*{\fill}{\rule{1ex}{1ex}}}
+\newcommand{\trans}[1]{\mathrel{\mathop{\to}\limits^{#1}}}
+
+\renewcommand \thechapter {\@Roman\c@chapter}
+\def\section{\@startsection{section}{2}{0pt}{2ex plus
+.5ex minus .5ex}{1.5ex plus .3ex minus .3ex}{\large\bf\raggedright}}
+\def\subsection{\@startsection{subsection}{3}{0pt}{1ex plus
+.2ex minus .2ex}{.5ex plus .1ex minus .1ex}{\normalsize\bf\raggedright}}
+\def\paragraph{\@startsection{paragraph}{4}{\z@}{1ex plus
+.2ex minus .2ex}{-1em}{\normalfont\normalsize\bfseries}}
+
+\makeatother
+
+\bibliographystyle{alpha}

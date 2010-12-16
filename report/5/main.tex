@@ -1,0 +1,55 @@
+\section{Obstacles}
+
+As expected, things did not go according to plan. Various delays, bugs, and
+other hold-ups caused much of the planned work to be omitted from the final
+result. Although certain of these problems may be attributed to external
+factors, mostly they were the result of either coding mistakes,
+misunderstandings of the standard library of Scala 2.8, or lack of
+motivation ("writer's block").
+
+\subsection{Code}
+
+The first major hold-up in the schedule was the realisation that at least
+the internals of the framework should be written in Scala, mostly thanks to
+the incredibly powerful typing system, but also owing a lot to its
+foundation as a functional language.
+
+Thus, learning to program in Scala, using Martin Oderskys excellent book,
+took about a week to get the basics down, and another week to get
+proficient enough to dare do some proper coding (as well as realising what
+version to use, the soon-to-be outdated 2.7 branch, or the
+still-in-progress 2.8 beta). With this done, however, the rest of the
+coding, especially the later parts, took far less time than they otherwise
+would have.
+
+However, there were still quite a few problems encountered that kept
+progress from being smooth. Most notably, an inconsistency in the standard
+library resulted in strange typing errors in several places. After a few
+days of digging, the problem was pointed out in the official scala IRC
+channel, and fixed upstream.
+
+A further problem arose when the basics were done, and more advanced
+algorithms and structures were to be implemented. First of all, most
+algorithms are described in an imperative manner in literature, and
+translating these to functional languages is not the easiest exercise at
+all times. Second, for rapid testing, it is preferrable to be able to
+describe trees and other objects in a more natural way than is possible
+using nested classes. Compare the two strings in fig %TODO
+for an example. Thus, some kind of parsing should be included in the basic
+classes. Luckily, the standard library of Scala includes exactly such a
+parser, in the form of the \texttt{scala.util.parsing.combinator} library.
+It is not trivially useful, though, and learning the proper ways to utilise
+this powerful utility took quite some time.
+
+\subsection{Motivation}
+
+More insidious, then, were the problems of motivation. This was especially
+apparent during the final month and a half, when colleagues and contacts on
+both hemispheres in general were having their vacations, as well as the
+work entering a phase where it was apparent that many of the original
+project goals were not going to be reached. Further compounding the problem
+was the fact that much of the off-time activities were limited to and by
+the ongoing football world cup. Once the duration in south africa was
+almost up, physical injury put a further dent in mental fortitude in the
+form of a broken foot.
+

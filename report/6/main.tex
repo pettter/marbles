@@ -1,0 +1,114 @@
+\section{Results}
+
+The results of the project were not as good or as extensive as was hoped or
+even expected. As detailed above, there were several reasons for this.
+However, quite a bit of work was done, and the code produced will, as
+intended, work as a basis for discussion about a proper implementation of
+the MARBLES framework.
+
+\subsection{Choice of language}
+
+The decision to be made was what programming language was to be used for
+the system. From the start, the choice was constricted by several
+prerequisites, the most prominent being that researchers with little or no
+interest in the internals need to be able to use the framework for his/her
+own code. Thus, the exposed interface need to be available in a somewhat
+well-known language. As the .Net framework was seen as too locked-in, what
+remained was either building on the JVM or exposing a C interface.
+
+A further (non-essential) requirement was for the language to have
+functions as first-class members, as many of the intended use cases involve
+manipulation of various algorithms and automata, and using those as
+functions themselves.
+
+Although various functional languages (e.g. Haskell) were considered, these
+were deemed too "unknown" to the general population of researchers to be
+much use. Recognition of the value of static typing, on the other hand,
+disqualified languages like Python or Ruby.
+
+Finally, Java was left as one of few languages that fulfilled most, though
+not all, requirements, but a lucky break revealed Scala as an almost ideal
+solution.
+
+Some key features of Scala:
+
+\begin{itemize}
+\item Functions as first-class citizens of the language
+\item A powerful static typing system, able to express the complex types
+that will show up in a framwork such as this.
+\item An ability to incorporate Java code, thanks to running on the JVM
+\item Relatively large and active development group, with many ties to
+academia
+\end{itemize}
+
+\subsection{Architecture}
+
+Architecture in the context of programming frameworks concerns mainly of
+dividing functionality into logical units, and defining how components of
+these units interact within and between these units. In the specific case
+of the MARBLES framework, the organisation of various types and the
+interaction of various kinds of inheritance is also of interest, as is the
+behaviour of certain GUI constructs.
+
+\subsubsection{Modules}
+
+The organisation of code into logical modules is one of the most basic
+steps toward any project, as the refactoring of module boundaries may be
+very time-consuming. Thus, a simple and logical scheme was devised, which
+can be seen in figure %TODO
+
+\subsubsection{Types}
+
+There are a number of different types that need defining. Roughly, the
+categories are trees of various kinds, automata of various types and
+various transducer types. In addition, a number of types need defining for
+interfacing with the GUI, and several more types are useful in building
+algorithms.
+
+\subsubsection{Traits}
+
+Trees and tree automata have various properties, some of which are
+orthogonal, others who are somehow connected. Examples include determinism
+in automata and order in trees. Normally, this would call for multiple
+inheritance of some kind, preferrably with inheritance of behaviour (as in
+C++) and not just appearance (as in Java). Scala, even though it is built
+on top of the JVM, provides multiple inheritance of behaviour, using
+\emph{traits}, which can be thought of as "interfaces with implementation".
+
+
+\subsubsection{GUI considerations}
+
+In planning for an eventual graphical interface to the framework, one would
+have to consider how to visualise trees, automata, transducers, etc. This
+could be done in a manner similar to Treebag, using any simple graph
+visualisation language. Further, some method of showing stepwise
+computation would be useful, meaning some way of extracting intermediate
+results and otherwise ''hidden'' state information.
+
+
+\subsection{Simplifications}
+
+%XXX XXX XXX Merge with Omissions? XXX XXX XXX
+
+In order to get some working code, certain advanced features of the final
+architecture was not included. The most glaring of these omissions is
+probably the lack of Java integration. % MORE EXAMPLES
+
+
+\subsection{Proof-of-concept algorithms}
+
+Several/Two algorithms were developed using the existing codebase, to show
+that it is in fact usable for somewhat ''real'' applications. The first
+being the Tree Transducer splitting used in engelfrietnotes to prove that
+any Bottom-Up Tree Transducer can be simulated with a composition of two
+Top-Down Tree Transducers, and vice versa.
+
+%TODO More
+
+\subsection{Omissions}
+
+Due to time and other constraints, not everything in the completed
+framework could even be considered in this prototype. Indeed, not even
+everything in the original plan was attempted in the final codebase. As
+such, certain elements of the above architecture was omitted, and others
+were ignored, while still others were somehow tweaked.

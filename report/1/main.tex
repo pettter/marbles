@@ -1,0 +1,112 @@
+\section{Introduction to tree automata theory}
+
+\subsection{Motivation}
+
+The theory of formal tree languages and tree automata is an extension of
+string language theory to work on trees. As data structured as trees turn
+up in many areas, classes of trees or tree languages also are of interest.
+Being able to talk about the various properties of these languages is thus
+a very interesting field of research. As such, the research fields
+concerning tree automata are active and developing.
+
+As a few examples of where tree automata seems to have an increasingly
+important role to play; compiler and processor design, natural language
+processing, and ---- all involve analysis of tree automata in various
+stages.
+
+In addition to these areas, --- has a fair number of additional examples
+where tree automata theory is increasingly important.
+
+
+%Theory of tree languages and tree automata is important and developing
+
+%Many areas of research use it.
+
+\subsection{Tree automata}
+
+An in-depth introduction to the basics of the theory of trees and tree
+automata can be found in \cite{engelfriet_notes}. Briefly, however, a tree
+is a structure consisting of an element of a set, the \emph{root}, and a
+(possibly empty) list of \emph{subtrees}. A tree with no subtrees is called
+a \emph{leaf}.
+
+Recall that a finite automaton in string language theory is a device
+consisting of a number of \emph{states}, and a \emph{transition table},
+instructing what state(s) are to be active after reading a symbol in a
+certain state. [[Use figures to show better]]
+
+However, once we turn our attention to trees, an obvious problem appears;
+we will need to start the computation either at the root, working
+downwards, or at all the leaves, working upwards. Further, we will need to
+take into consideration the fact that we will have multiple parallell
+computations going in (one for each "branch").
+
+Thus, we arrive at a first distinction between different kinds of tree
+automata: the top-down (starting computation at the root) and bottom-up
+(starting computation at the leaves) automata, respectively. It is perhaps
+notable that this is not a mere conceptual distinction; the expressive
+power of various top-down automata are in fact different from the
+comparative bottom-up automata.
+
+Furthermore, tree automata, like string automata, can be deterministic or
+nondeterministic, and can be equipped with a memory stack, or a linearly
+bounded memory, as well as a conceptually infinite memory.
+
+\subsubsection{Transducers}
+
+%Intuition
+
+%Definition
+
+%Properties
+
+\subsection{Grammatical inference}
+
+Grammatical inference is the practise of taking some information about a
+language (usually examples of that language, what class of languages it is
+a member of and possibly some additional guarantees or caveats) and
+computing (inferring) the organising principles for that language (the
+grammar). More specifically, the kind of grammatical inference mainly
+discussed in this report is the inference of tree automata from an
+annotated corpus of trees, that is, a corpus containing trees both inside
+and outside the language, with information about which is which. 
+
+The basis for most research in grammatical inference is the paper "Language
+identification in the limit" by E.M. Gold. The theory was further developed
+by Dana Angluin, and gave rise to the notion of so-called Angluin learning,
+which allows the learner algorithm to pose queries to a teacher (oracle)
+about
+\begin{itemize}
+\item Specific elements, with the teacher responding whether the element is
+in the language or not
+\item A completed model, with the teacher responding with either a
+counterexample (i.e. an object that the model classifies incorrectly as
+either being within or outside the target language), or a token indicating
+that the model is, in fact, correct.
+\end{itemize}
+
+A key requirement for Angluin learning is that the class of languages that
+is 
+
+%Intuition
+
+%Relevance of tree languages (Myhill-Nerode)
+
+%Various algos
+
+\subsection{Relation to other fields}
+
+Tree automata, and inference of tree automata, are used in many places.
+Notably, seeing as every XML document can be viewed as a tree, and that
+most kinds of document type definitions are directly translateable to
+various forms of tree automata, it is no surprise that these techniques are
+becoming increasingly relevant as generic data processing gets more
+attention as a field of more formal study.
+
+
+%Usage in XML/Generic data processing
+
+%Compiler design
+
+%Natural languages
+

@@ -1,0 +1,18 @@
+vad är nytt?
+
+grundiden at man har algoritmer med automater/foo som in och utdata -
+kombinera/plocka isär
+
+fokusera på att det är _generellt_, det är det som är det "nya"
+
+förutom det implementera/gå igenom några algoritmer för att visa som
+"praktiska" exempel
+
+ta även upp det tekniska/praktiska i bakgrunden - "software engineering"
+
+ideer: snitt av två NFTA
+tag NFTA + TDTTD  -> TDTTD som bara är definierad på L(NFTA)
+
+skriva lite om trädautomatalgoritmer i en funktionell paradigm..?
+
+

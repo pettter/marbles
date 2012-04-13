@@ -1,0 +1,43 @@
+% environment definitions
+\spnewtheorem{Theorem}{Theorem}{\bfseries}{\normalfont}
+\spnewtheorem{Lemma}[Theorem]{Lemma}{\bfseries}{\normalfont}
+\spnewtheorem{Corollary}[Theorem]{Corollary}{\bfseries}{\normalfont}
+\spnewtheorem{Definition}[Theorem]{Definition}{\bfseries}{\normalfont}
+\spnewtheorem*{proofsketch}{Proof sketch}{\itshape}{\normalfont}
+
+% bars for algorithms
+
+\newcommand{\vbar}{\raisebox{-.8ex}[0pt][0pt]{\rule{.5pt}{\baselineskip}}\ }
+\newcommand{\vbart}{\raisebox{-.8ex}[0pt][0pt]{\rlap{\rule[\baselineskip]{1ex}{.5pt}}\rule{.5pt}{\baselineskip}}\ }
+\newcommand{\vbarb}{\raisebox{-.8ex}[0pt][0pt]{\rlap{\rule{1ex}{.5pt}}\rule{.5pt}{\baselineskip}}\ }
+\newcommand{\vbartb}{\raisebox{-.8ex}[0pt][0pt]{\rlap{\rule[\baselineskip]{1ex}{.5pt}}\rlap{\rule{1ex}{.5pt}}\rule{.5pt}{\baselineskip}}\ }
+
+%\newcommand{\nat}{\mathbb N}
+\newcommand{\symdiff}{\mathop{\text{\small$\triangle$}}}
+\newcommand{\sig}[1][]{%
+  \def\temp{#1}%
+  \ifx\temp\empty\Sigma\else\Sigma_{(#1)}\fi}
+\newcommand{\trees}{\mathrm T}
+\newcommand{\nod}{\mathrm{nodes}}
+\newcommand{\lea}{\mathrm{leaves}}
+\newcommand{\cont}{\mathrm C}
+\newcommand{\trans}[1]{\mathop{\to}\limits^{#1}}
+\newcommand{\fin}{\mathrm{fin}}
+\newcommand{\ot}{\mathit{obs}}
+\newcommand{\loc}{\mathrm{locate}}
+\newcommand{\poscorp}{\mathit{C}^+}
+\newcommand{\negcorp}{\mathit{C}^-}
+
+
+\newcommand{\ltree}{\ensuremath{\mathrm L_*^{\mathsf{tree}}}}
+\newcommand{\ltab}{\ensuremath{\mathrm L_*^{\mathsf{table}}}}
+
+\newcommand{\avg}[1]{\mathit{avg}(#1)}
+\newcommand{\cent}[1]{\mathit{c}(#1)}
+\newcommand{\card}[1]{|#1|}
+
+\newcommand{\includegraphs}[2]{%
+\includegraphics[viewport=2.9cm 2cm 18.9cm 26.7cm,width=0.40\textwidth,clip=true]{#1}%
+\hfill%
+\includegraphics[viewport=2.9cm 2cm 18.9cm 26.7cm,width=0.40\textwidth,clip=true]{#2}%
+}

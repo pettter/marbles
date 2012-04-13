@@ -1,0 +1,65 @@
+intro{
+Vad vill jag ha med?
+
+Prat om träd och trädspråk generellt
+
+Prat om tidigare arbeten - specialiserade och/eller fokus på träd snarare
+än trädautomater
+
+Problem med att få fram vettiga tester, mycket handhackande
+
+Ide (från papper) - jobba generellt med automaterna i sig, inte med
+specifika träd och exempelautomater - bygg upp en databas av träd,
+trädspråk och algoritmer för att producera fler och modifiera.
+}
+
+metod{
+översiktlig projektplan
+
+val av språk - tanke bakom
+dvs
+bekant för forskare, eller åtminstone lätt att interagera med
+expressivt och lämpligt för problemen - gärna kraftfullt typsystem
+gärna relativt stabil grund och framtidssäkrat, plattformsoberoende
+
+systembeskrivning - vad kan det, hur ser det ut, vad saknas
+träd, trädautomater, trädgrammatiker, tree transducers definierade med
+parsers och viktade varianter
+algoritmer kan byggas relativt snabbt, och exempel återanvändas
+grafiskt UI saknas
+testad java-integration saknas, men scala är i allmänhet snällt med sådant
+
+}
+
+resultat {
+
+Mappa mot projektplanen, hur höll den, vad blev det av det?
+
+Språkvalet blev funktionellt, men de flesta algoritmer är inte skrivna
+funktionellt. Hur översätta? Hur tänka för att skriva funktionella
+trädalgoritmer/automatalgoritmer? (eventuellt slutsats..)
+
+Implementera diverse algoritmer
+splitta trädtransducers
+snitt av två nfta
+fler?
+}
+
+slutsats/future work {
+Det som finns, finns
+
+det som behövs är:
+
+först och främst bättre intern ordning - mer dokumentaiton, fler
+funktioner, mer generalitet, mer delad kod (mellan viktade/oviktade
+varianter osv)
+
+Det behövs även ordentlig javaintegration, eller åtminstone dokumentation
+av den existerande.
+
+Slutligen behövs det fler varianter av automater, träd, semiringar,
+algoritmer osv osv, samt någon form av databas för att dela med sig.
+
+}
+
+

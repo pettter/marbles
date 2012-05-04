@@ -1,5 +1,39 @@
 \section{Preliminaries}
 
+In order to fully appreciate the potential applications and programming
+patterns used in the Marbles prototype, it is necessary to first go through
+some basics of formal tree language theory. In principle, the extension
+from string languages is simple - simply allow more than one successor to
+each symbol - but obviously this is not sufficiently well-defined to
+function very well, formally.
+
 \subsection{Introduction to trees and tree languages}
+
+We define an \emph{alphabet} to be any nonempty set $\Sigma$ of
+\emph{symbols}, which can be extended to be a \emph{ranked alphabet}
+by adding a mapping $R$ from $\Sigma \rightarrow K \subset N$.
+
+The number $k = R(s)$ we name the \emph{rank} of the symbol $s \in \Sigma$.
+We also define the sets $ \forall_{k \in \mathit{range}(R)} \Sigma_k = \{s \in \Sigma \mid R(s) = k\}$
+As a convention, we may use a subscript to make the rank explicit, i.e. a
+symbol $s$ with rank $R(s) = 2$ may be written $s_2$. Requiring that
+symbols have one rank only is not in general necessary, but makes some
+proofs and theorems easier to state.
+
+A \emph{tree} can be defined in many ways: as an acyclic graph with a
+designated root node or as terms, for example. We persist in moving from a
+string perspective, however, and reach this definition:
+
+Let $\{[, ]\}$ be a set of auxiliary symbols, disjoint from any other alphabet considered herein.
+The set $T_\Sigma$ of \emph{trees over the (ranked)
+alphabet $\Sigma$} is the set of strings defined inductively as follows
+\begin{compactitem}
+\item for  $a \in \Sigma_0, t = a \in T_\Sigma$
+\item for  $a \in \Sigma_k, k \geq 1, t_1 \ldots t_k \in T_\Sigma,  t = a[t_1
+\ldots t_k] \in T_\Sigma,$
+\end{compactitem}
+
+
+
 
 

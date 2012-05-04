@@ -1,0 +1,125 @@
+\section{Introduction}
+
+%XXX This might be more of an abstract...
+In \cite{drewes_marbles}, Drewes outlines Marbles, a programming framework
+for working in a generic and systematic way, not only on trees, as several
+frameworks already exist for this purpose, but on tree recognisers,
+transducers, generators and other formal devices as well (collectively:
+tree automata). This thesis focuses on a proposed implementation of this
+framework, with special focus on the choice of language and ease of
+extension.
+
+Formal tree language theory is an active area of research that is
+continually finding new applications within such diverse subjects as model
+checking, compiler design and natural language processing. 
+
+The theoretical basis of formal tree language theory is the regular string
+automata theory popularised and expanded by Chomsky, Shützenberger et. al.
+in the 1950's. Specifically, the automata hierarchies of the string cases
+have rough equivalents when working on trees, and many results that hold
+for the string case are applicable to the tree case. 
+
+Trees and tree automata has been an area of finite-automata theoretical
+research since the 1960's, when researchers realised that large parts of
+traditional string automata theory could be extended by replacing strings
+with trees. Through finding ever more applications in recent years, the
+area sees more research than ever before. 
+
+Implementation of various tree automata and the algorithms working on same
+have been fragmented, however, and data and code exchange has suffered as a
+result. Several efforts are nevertheless worthy of mention, not least the
+Treebag\cite{drewes_treebag} system, as Marbles is in a large part based on
+ideas from that project.
+
+
+This section will continue with a general introduction to the subject
+of the thesis, including a discussion on previous work in the area and an
+introduction to the goals of the thesis project. Section
+\ref{sec_preliminaries} will dig deeper into the theoretical fundaments
+required for the rest of the thesis, while Section \ref{sec_method} will
+describe the method used to reach the project goals. Section
+\ref{sec_method} also includes a discussion on the choice of programming
+language, as well as the basic architecture of the prototype system.
+
+Section \ref{sec_results} will discuss the resulting system, and some of
+the implications of the choices made in the prototyping process. In
+particular, how the implementation of certain algorithms differ from their
+generic description. Further, several proof-of-concept algorithm
+implementations will be presented and discussed.
+
+Finally, Section \ref{sec_conclusions} will contain a number of closing
+remarks, and introduce the next steps in making the prototype into an
+actual working framework, useable for research purposes.
+
+\subsection{Motivation and previous work}
+
+
+%TODO: previous work
+
+\subsection{Project goals}
+
+While the above projects and systems are very useful in their specific
+domains, they are nevertheless developed to explore those domains, and in
+some sense constrained by them. Marbles, in contrast, aims to be a
+jack-of-all-trades programming framework, supporting exploration of tree
+automata and tree-based algorithms through being extensible and flexible
+enough for first-approximation work in practically any domain.
+
+As may be apparent, a complete framework of this size and complexity is not
+a viable goal for a thesis at the MSc level. Instead, we aim to propose a
+viable basis for further research into a complete framework. Specifically,
+we aim to
+\begin{compactitem}
+\item Explore the potential programming language choices
+\item Choosing a reasonable subset of tree formalisms for implementation
+\item Make a viable prototype for the Marbles system, in particular the
+prototype should,
+\subitem be usable for at least a small part of the tasks covered by the
+full system
+\subitem include conrete implementations of some of the concepts described in
+\cite{drewes_marbles}, and
+\subitem have a reasonable architecture, suitable for further
+implementation work, with a view to eventually be expanded into the
+complete framework.
+\end{compactitem}
+
+
+
+
+
+
+
+This thesis aims to propose an implementation for the ideas outlined in
+\cite{drewes_marbles}.  
+
+
+
+
+The use of various tree formalisms has penetrated many different areas of
+research. As such, the investigation of trees and tree automata is ever
+more relevant and interesting. 
+
+
+
+
+There are many areas of research where 
+
+While working on various topics, researchers frequently encounter
+situations which require working on structured data in some way. It is
+often useful to structure the data as a tree, where the values of the
+subtrees in some way contribute to the values of the whole tree (e.g. XML
+data). In the study of formal languages, many algorithms and formal devices
+have been developed for handling and defining groups (languages) of trees.
+
+
+
+A common problem when working with trees and tree automata is the lack of
+generic programming tools, leading to the need for much duplication of
+functionality. Contrast this to the many various generic string handling
+libraries available, or even included in the standard libraries of various
+programming languages.
+
+Though establishing a generic and versatile tree handling is not the focus
+of this thesis, it is nevertheless a prerequisite for the end goal. 
+
+That end goal

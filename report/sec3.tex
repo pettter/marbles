@@ -1,0 +1,110 @@
+\section{Method}
+
+\subsection{Basics of Scala}
+
+Scala is a functional-object oriented hybrid language with static typing
+and a syntax designed to remove boilerplate and increase legibility. It is
+designed to run on both the Java JVM and Microsofts .Net infrastructures,
+and has a large standard library that handles much of the underlying
+complexities in various common tasks. 
+
+Everything in Scala is an object, down to the integral data types
+(\texttt{int} and so on), and functions. However, as opposed to Java or C#,
+there is no such thing as a static method. Instead, classes have so-called
+''companion objects'', being in principle singletons, usually containing
+the static methods and constants, as well as various factory methods.
+Companion objects and their companion classes each have private access to
+the other.
+
+Probably the most significant difference between Scala and C#/Java is
+multiple implementation inheritance. That is, while Java classes inherit
+only from a single class, but potentially multiple interfaces, each
+interface only describes methods that need to be present in the class, no
+actual code to make use of these methods. In contrast, Scala traits are
+''rich'', in the sense that they can make use of the defined methods to
+provide more functionality. For example, by inheriting (mixing in) the
+trait \texttt{Ordered[T]} and implementing the single abstract method
+\texttt{compare}, all of the comparison operators (\texttt{< > <= >=})
+become available, as well as various sorting methods on collections of the
+class.
+
+As a practical example, let us examine the \texttt{Tree} class as defined
+in the Marbles prototype:
+
+\begin{verbatim}
+/** An ordered tree with nodes of a certain type
+ */
+class Tree[+T] (val root : T, 
+		        val subtrees: Seq[Tree[T]]
+			) { 
+\end{verbatim}
+
+This defines the \texttt{Tree} class as having a class parameter
+(\texttt{T}), with subtyping being covariant in that parameter. That is, a
+\texttt{Tree[String]} is considered a subtype of \texttt{Tree[AnyRef]},
+which is useful for having generic functions that work on any possible tree
+in a consistent way, while avoiding having to parameterise those functions.
+
+Further, we define a default constructor, the relevant parameters/instance
+variables, and how these relate to the type parameter. As is readily
+apparent, these are a root of type \texttt{T}, and a sequence (list) of
+subtrees, each having the same type parameter.
+
+\begin{verbatim}
+	/** Substitute all occurances of a certain symbol for a tree over the
+	 *  same type (or a supertype) returns a tree over the new type
+	 */
+	def subst[U >: T](sym : U,sub : Tree[U]) : Tree[U] = {
+		subst(Map[U,Tree[U]]((sym ,sub)))
+	}
+
+	/** Substitute all occurances of certain symbols for designated 
+	 *  trees over the same type (or a supertype) returns a tree over the
+	 *  new type
+	 */
+	def subst[U >: T](subs : Map[U,Tree[U]]) : Tree[U] = {
+		if(subs isDefinedAt root)
+			subs(root)
+		else
+			new Tree[U](root,subtrees map(_.subst(subs)) toList)
+	}
+\end{verbatim}
+
+These functions allow us to apply a simple substitution to the tree. 
+
+\begin{verbatim}
+	
+	/** Apply a function to every node of this tree.
+	 */
+	def map[To](f : (T) => (To)):Tree[To] = {
+		new Tree(f(root), subtrees map (_ map f))
+	}
+	
+	/** Get the leaf trees of this tree
+	 */
+	def leaves:Seq[Tree[T]] = if(subtrees.size == 0)
+										this :: Nil 
+									else
+										subtrees flatMap (_.leaves)
+
+	override def toString : String = subtrees.size match { 
+		case 0 => root toString
+		case _   => root.toString + subtrees.mkString("[",",","]") 
+	}
+
+	override def equals(other : Any) = other match{
+		case that : Tree[_] => this.root == that.root &&
+							   this.subtrees == that.subtrees
+		case _ => false
+	}
+
+	override def hashCode = 41 * ( 41 + root.hashCode) + subtrees.hashCode
+	
+
+}
+
+\end{verbatim}
+
+
+
+

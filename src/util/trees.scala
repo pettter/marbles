@@ -43,7 +43,7 @@ object Tree {
 
 	/** Extracts the root and subtrees of a tree.
 	 */
-	def unapply[T](t:Tree[T]):(T,Seq[Tree[T]]) = (t.root,t.subtrees)
+	def unapply[T](t:Tree[T]):Option[(T,Seq[Tree[T]])] = Some((t.root,t.subtrees))
 	
 }
 
@@ -92,6 +92,8 @@ class Tree[+T] (val root : T,
 										this :: Nil 
 									else
 										subtrees flatMap (_.leaves)
+
+	def depth:Int = ((subtrees map (_.depth)) max) + 1
 
 	override def toString : String = subtrees.size match { 
 		case 0 => root toString

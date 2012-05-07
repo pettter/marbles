@@ -1,5 +1,6 @@
 package marbles
 package automaton
+import marbles.util.Tree
 
 trait TreeGrammar[T]
 	extends Iterator[Tree[T]]

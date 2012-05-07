@@ -1,5 +1,34 @@
 \section{Method}
 
+\subsection{Choice of language}
+
+As the prototype was intended to function as a base on which the full
+system could be built, much thought was spent on the choice of language.
+Ideally, the language would be familiar to a large number of researchers,
+while having several desirable features, such as platform-independece, easy
+extensibility and a powerful typing system. Initially, the languages
+considered were C++, Java and Haskell (C# being seen as far too closely
+tied to the Microsoft Windows platform). However, as C++ is both hard to
+distribute in a platform-independent form, and notoriously
+counterintuitive, the deliberations quickly centered on Java or Haskell,
+with Java being seen as being unnecessarily strict and full of boilerplate
+code, whereas Haskell instead was unfamiliar to most researchers and hard
+to extend and distribute in a reasonable manner. After being informed of
+the existance of Scala, however, it seemed the ideal choice.
+
+While at the time it was not as well-known as even Haskell, it nevertheless
+had an active community, and showed great promise for the future. Further,
+it touted easy integration into the Java ecosystem, meaning researchers
+interested in using Marbles would likely be able to write their client code
+in Java, and use the Scala parts of the framework behind the scenes.
+Strong, static typing, but with heavy use of type inference further tipped
+the scales, promising to remove much of the boilerplate required in Java
+code. Finally, Scala allows for much coding to be done using a functional
+programming paradigm, which offers certain other benefits in code
+readability.
+
+%TODO blablabla
+
 \subsection{Basics of Scala}
 
 Scala is a functional-object oriented hybrid language with static typing
@@ -70,15 +99,38 @@ subtrees, each having the same type parameter.
 	}
 \end{verbatim}
 
-These functions allow us to apply a simple substitution to the tree. 
+%TODO: SHould this be straight symbol substitution?
 
-\begin{verbatim}
-	
+These functions allow us to apply a simple substitution to the tree, that
+is, in this tree and all subtrees, we can replace any instance of a
+specific symbol by a tree, erasing the previous subtree rooted at that
+node. Alternatively, we can do several of these at once, using the second
+form. Finally, and most importantly, while we cannot change the type of the
+resulting tree to \emph{any} type, as long as the symbol type is a subclass
+of the substitute class (the \texttt{[U >: T]} restriction on the type
+parameter), the transformation still makes sense. 
+
+For example, if the classes \texttt{Rectangle} and \texttt{Circle} both
+inherit from the class \texttt{Shape}, then a \texttt{Tree[Rectangle]}
+could have a susbtitution applied that changed, say, the first ten
+integer-sized squares to \texttt{Circles} instead, resulting in a
+\texttt{Tree[Shape]}.
+
+\begin{verbatim}	
 	/** Apply a function to every node of this tree.
 	 */
 	def map[To](f : (T) => (To)):Tree[To] = {
 		new Tree(f(root), subtrees map (_ map f))
 	}
+\end{verbatim}
+
+While the substitution transformation is not required to substitute every
+possible symbol for another (indeed, they will often just substitute a
+few), the \texttt{map} method instead applies a function to each node in
+the tree, and returns the result. In many cases, the resulting type
+(\texttt{To}) will have no particular relation to the current tree type.
+
+\begin{verbatim}
 	
 	/** Get the leaf trees of this tree
 	 */
@@ -86,7 +138,16 @@ These functions allow us to apply a simple substitution to the tree.
 										this :: Nil 
 									else
 										subtrees flatMap (_.leaves)
+\end{verbatim}
 
+This returns a left-to-right list of the leaves of the tree, in effect
+applying the \texttt{yield} function to the tree. Specific Scala constructs
+of note are using the cons operator (\texttt{::}) to create a list, and
+the \texttt{flatMap} function to first apply the function to each member of
+\texttt{subtrees} and then flattening the resulting lists
+(\texttt{[["a","b"],["c"]]} becomes \texttt{["a","b","c"]})
+
+\begin{verbatim}
 	override def toString : String = subtrees.size match { 
 		case 0 => root toString
 		case _   => root.toString + subtrees.mkString("[",",","]") 
@@ -99,12 +160,107 @@ These functions allow us to apply a simple substitution to the tree.
 	}
 
 	override def hashCode = 41 * ( 41 + root.hashCode) + subtrees.hashCode
-	
-
 }
-
 \end{verbatim}
 
+Finally, we override some functions to make printing, comparisons and
+hashing possible. Without these, the standard \texttt{AnyRef} methods would
+be called instead, but these are based on object reference addresses, which
+is not suitable for most applications, though they are no doubt faster than
+the above methods. 
 
+In addition to the class itself, there is a companion object defined for
+the \texttt{Tree} class:
+\begin{verbatim}
+/** Companion object for the Tree class. Contains factory and constructor
+ *  methods, as well as extractors.
+ */
+object Tree {
+	/** Standard factory method
+	 */
+	def apply[T](rt:T,ss:Seq[Tree[T]]) = new Tree(rt,ss)
+	
+	/** Factory for leaves
+	 */
+	def apply[T](rt:T) = new Tree(rt,Nil)
+	
+\end{verbatim}
+
+Including various factory methods in the companion object is standard
+practise for Scala classes. The special method name \texttt{apply} can be
+omitted in calls, i.e. \texttt{Tree(foo, bar)} is equivalent to
+\texttt{Tree.apply(foo, bar)}. Unsurprisingly, this is how function objects
+are defined in Scala. 
+
+\begin{verbatim}
+	/** Extracts the root and subtrees of a tree.
+	 */
+	def unapply[T](t:Tree[T]):(T,Seq[Tree[T]]) = (t.root,t.subtrees)
+\end{verbatim}
+
+The special method \texttt{unapply} works as a sort of \texttt{apply} in
+reverse. Specifically, it can be used to extract information from arbitrary
+classes in pattern matching and similar situations. For example, you can do
+pattern matchin on \texttt{Tree}s as such:
+
+\begin{verbatim}
+t match {
+  case Tree(root:T, Nil) =>  //Do something 
+  case Tree(root:U, Nil) =>  //Do something
+  case Tree(root:U, subtrees) =>  //Do something
+}
+\end{verbatim}
+
+Again, this is largely syntactic sugar to make things more intuitive than
+would otherwise be possible.
+
+\begin{verbatim}
+	/** A parser for trees on the form "root[tree,...]" or "root" if the
+	 *  tree is a leaf. 
+	 */
+	implicit def treeParser[T](implicit rootParsers:ElementParsers[T]) = new ElementParsers[Tree[T]] {
+		val root:Parser[T] = rootParsers
+		def tree:Parser[Tree[T]] =
+			(root~opt("["~>repsep(tree,",")<~"]")) ^^ {
+				case root~None       => new Tree(root,Nil)
+				case root~Some(subs) => new Tree(root,subs)
+			}
+
+		def start = tree
+	}
+}
+\end{verbatim}
+
+Finally, we define a parser for generic trees. This requires several tricks
+to work properly, and it is unknown what other language would be able to
+accomplish this so concisely. Specifically, the parser is defined
+\texttt{implicit}, meaning it can be accessed as an implicit argument to
+functions where it is in scope. The \texttt{treeParser} method also takes
+such an implicit argument, specifically a parser \texttt{root} of the
+symbol type \texttt{T}. The combinator parsing itself is somewhat obvious,
+in that it uses the \texttt{root} parser to parse the root of the specific
+subtree, and then optionally reads a \texttt{[}, followed by a number of
+subtrees separated by \texttt{,}.
+
+What is interesting to note is that the members of the companion object of
+type \texttt{T} is in scope to be included as implicit arguments, meaning
+that in order to allow any type to be included as symbols in trees, all
+that is required is to include an \texttt{ElementParsers} of the type in
+question in its companion object, and then apply the parameterised tree
+parser. Alternatively, you could explicitly include a parser as an argument
+to the tree parser. %TODO: expand?
+
+In fact, the combinator parsers of the Scala standard library is sufficient
+for most of these tasks, but the \texttt{ElementParsers} class was required
+in order to allow the parsers to be properly utilised. In particular, type
+erasure and a few other issues made defining regular \texttt{Parser}s as
+implicit and utilising them properly a difficult, if not impossible, task.  
+
+The Marbles prototype include parsers for \texttt{String}, \texttt{Int} and
+\texttt{Double} in the \texttt{marbles.util} package. See
+\texttt{Util.scala} for the specifics.
+
+For further details on Scala syntax and programming, the excellent book
+\textit{Programming in Scala} by Odersky et. al. is highly recommended. 
 
 

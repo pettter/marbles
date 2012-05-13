@@ -2,18 +2,18 @@ val but = new BUTreeTransducer[Char,Char](
 new RankedAlphabet(Map(('a',0),('b',1),('c',2))),
 new RankedAlphabet(Map(('a',0),('b',1),('d',3))),
 Set("q"),
-Map((('a',Nil)          , Set((OrderedVarTree('a',0), "q"))),
-    (('b',Seq("q"))     , Set((OrderedVarTree('b',1), "q"))),
+Map((('a',Nil)          , Set((VarTree('a',0), "q"))),
+    (('b',Seq("q"))     , Set((VarTree('b',1), "q"))),
 	(('c',Seq("q","q")) , Set(
-			(OrderedVarTree(Right('d'),Seq[OrderedVarTree[Char]](
-				OrderedVarTree(Left(Variable(0)),Nil),
-				OrderedVarTree(Left(Variable(0)),Nil),
-				OrderedVarTree(Left(Variable(1)),Nil))),
+			   (VarTree(Right('d'),Seq[VarTree[Char]](
+				VarTree(Left(Variable(0)),Nil),
+				VarTree(Left(Variable(0)),Nil),
+				VarTree(Left(Variable(1)),Nil))),
 			"q"),
-			(OrderedVarTree(Right('d'),Seq[OrderedVarTree[Char]](
-				OrderedVarTree(Left(Variable(0)),Nil),
-				OrderedVarTree(Left(Variable(1)),Nil),
-				OrderedVarTree(Left(Variable(1)),Nil))),
+			   (VarTree(Right('d'),Seq[VarTree[Char]](
+				VarTree(Left(Variable(0)),Nil),
+				VarTree(Left(Variable(1)),Nil),
+				VarTree(Left(Variable(1)),Nil))),
 			"q")
 		)
 	)

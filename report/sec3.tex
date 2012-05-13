@@ -1,266 +1,425 @@
-\section{Method}
+\subsection{Tree automata}
 
-\subsection{Choice of language}
+As various types of tree automata form the building blocks of Marbles, we
+include their description and implementation as part of the work required
+to reach the result rather than as a part of the result itself.
 
-As the prototype was intended to function as a base on which the full
-system could be built, much thought was spent on the choice of language.
-Ideally, the language would be familiar to a large number of researchers,
-while having several desirable features, such as platform-independece, easy
-extensibility and a powerful typing system. Initially, the languages
-considered were C++, Java and Haskell (C# being seen as far too closely
-tied to the Microsoft Windows platform). However, as C++ is both hard to
-distribute in a platform-independent form, and notoriously
-counterintuitive, the deliberations quickly centered on Java or Haskell,
-with Java being seen as being unnecessarily strict and full of boilerplate
-code, whereas Haskell instead was unfamiliar to most researchers and hard
-to extend and distribute in a reasonable manner. After being informed of
-the existance of Scala, however, it seemed the ideal choice.
+As described in section \ref{ssec_fsa}, finite automata are constructs that
+in general have a few things in common, notably an alphabet, a state set,
+and a rule set. In Marbles, the \texttt{Alphabet} is simply a \texttt{Set}
+of some type \texttt{T}, while a \texttt{RankedAlphabet} is a map from some 
+\texttt{T} to \texttt{Int}. States could be of any type, conceptually, but
+in the current prototype, they are ;\texttt{String}s. The type of the rule
+sets obviously vary between different automata types, but in general are
+\texttt{Map}s of the approriate type, with either a single tuple or state
+as the right-hand side, or a \texttt{Set}, if the automata type is
+non-deterministic.
 
-While at the time it was not as well-known as even Haskell, it nevertheless
-had an active community, and showed great promise for the future. Further,
-it touted easy integration into the Java ecosystem, meaning researchers
-interested in using Marbles would likely be able to write their client code
-in Java, and use the Scala parts of the framework behind the scenes.
-Strong, static typing, but with heavy use of type inference further tipped
-the scales, promising to remove much of the boilerplate required in Java
-code. Finally, Scala allows for much coding to be done using a functional
-programming paradigm, which offers certain other benefits in code
-readability.
+\subsubsection{Recognisers}
 
-%TODO blablabla
+Extending string recognisers (FSA) to the tree case entails, as mentioned,
+some way of handling branches, with a choice being made as to moving from
+the root downwards (top-down) or from the leaves up (bottom-up) during
+processsing. Both of these approaches are available in Marbles, using the
+\texttt{TDNFTA} and \texttt{BUNFTA} classes, respectively. With more
+theoretical rigour:
 
-\subsection{Basics of Scala}
+A \emph{bottom-up non-deterministic finite tree automaton (BUDFTA)} is a
+4-tuple $A = (\Sigma, Q, R, F)$ where
+\begin{compactitem}
+\item $Q$ is a ranked alphabet of states such that $Q = Q_0$
+\item $F \subseteq Q$ is a ranked alphabet of final states
+\item $\Sigma$ is the (ranked) \emph{tree alphabet} and
+\item $R$ is a set of rules on the form
+$a[q_1 \ldots q_k] \rightarrow q'$ for $q',q_1 \ldots q_k \in Q, a \in
+\Sigma_k$
+\end{compactitem}
+\vspace{0.4cm}
 
-Scala is a functional-object oriented hybrid language with static typing
-and a syntax designed to remove boilerplate and increase legibility. It is
-designed to run on both the Java JVM and Microsofts .Net infrastructures,
-and has a large standard library that handles much of the underlying
-complexities in various common tasks. 
+In Marbles, this is represented by the \texttt{BUNFTA} class, which
+contains the instance variables \texttt{sigma}, \texttt{states},
+\texttt{rules}, and \texttt{fin}, which obviously corresponds exactly to
+the structure described above. The rule set is of the type
+\texttt{Map[(T,Seq[String]),Set[String]]}, which, again, corresponds rather
+exactly to how we describe them in algorithms. As was mentioned in the
+introduction to this section, we use a \texttt{Set} to gather the various
+right-hand sides corresponding to a particular left-hand side.
 
-Everything in Scala is an object, down to the integral data types
-(\texttt{int} and so on), and functions. However, as opposed to Java or C#,
-there is no such thing as a static method. Instead, classes have so-called
-''companion objects'', being in principle singletons, usually containing
-the static methods and constants, as well as various factory methods.
-Companion objects and their companion classes each have private access to
-the other.
+Moving on with the theoretical definition, a configuration of a BUNFTA $A$
+running on a tree $t$ is a 4-tuple
+$C = (A, t, \Sigma', t')$ where
+\begin{compactitem}
+\item $A$ is the automaton,
+\item $t$ is the tree,
+\item $\Sigma'$ is a ranked alphabet with $\Sigma'_k = \Sigma_k$ for $k >
+$0 and $\Sigma'_0 = \Sigma_0 \cup Q$, and
+\item $t'$ is tree over $\Sigma'$, called the position tree.
+\end{compactitem}
+\vspace{0.5cm}
 
-Probably the most significant difference between Scala and C#/Java is
-multiple implementation inheritance. That is, while Java classes inherit
-only from a single class, but potentially multiple interfaces, each
-interface only describes methods that need to be present in the class, no
-actual code to make use of these methods. In contrast, Scala traits are
-''rich'', in the sense that they can make use of the defined methods to
-provide more functionality. For example, by inheriting (mixing in) the
-trait \texttt{Ordered[T]} and implementing the single abstract method
-\texttt{compare}, all of the comparison operators (\texttt{< > <= >=})
-become available, as well as various sorting methods on collections of the
-class.
+A run of a BUNFTA $A$ on a tree $t$ is a sequence of configurations $C_0
+\ldots C_l$ such that for all configurations, $A$, $t$ and $\Sigma'$ are
+equal, and for each successive pair of configurations $C_n$, $C_{n-1}$, the
+trees $t'_n$ and $t'_{n-1}$ are related as follows: 
+\begin{compactitem}
+\item There is a subtree $a[q_1 \ldots q_k], q_1 \ldots q_k \in Q$ at a position $p$ in $t'_{n-1}$
+\item there is a subtree $q'\in Q$ at position $p$ in $t'_n$
+\item $t'_{n-1}$ and $t'_n$ are otherwise equal, and
+\item there is a rule $a[q_1 \ldots q_k] \rightarrow q'$ in $R$
+\end{compactitem}
+\vspace{0.5cm}
 
-As a practical example, let us examine the \texttt{Tree} class as defined
-in the Marbles prototype:
+An accepting run ${C_0 \ldots C_n}$ of a BUNFTA $A$ on a tree $t$ is a run where
+\begin{compactitem}
+\item in $C_0, t' = t$ and
+\item in $C_n, t' \in F$ %TODO: Update other run-definitions
+\end{compactitem}
+\vspace{0.5cm}
 
-\begin{verbatim}
-/** An ordered tree with nodes of a certain type
- */
-class Tree[+T] (val root : T, 
-		        val subtrees: Seq[Tree[T]]
-			) { 
-\end{verbatim}
+The set $L(A)$ of trees on which an accepting run can be constructed for a
+BUNFTA $A$ is the language of the automaton. The class of languages
+recognised by BUNFTA is the \emph{regular tree languages}.
 
-This defines the \texttt{Tree} class as having a class parameter
-(\texttt{T}), with subtyping being covariant in that parameter. That is, a
-\texttt{Tree[String]} is considered a subtype of \texttt{Tree[AnyRef]},
-which is useful for having generic functions that work on any possible tree
-in a consistent way, while avoiding having to parameterise those functions.
+In Marbles, running the automaton on a tree to see if it part of the
+language is a simple manner of using the \texttt{apply} method, either
+explicitly or through just using the \texttt{object(arguments)} syntax.
+Further, the \texttt{applyState} method will reveal the exact state set
+that a specific subtree ends up in, while \texttt{isDeterministic} checks
+if the nondeterminism is actually required for the specific automaton.
+Also, parsing of an automaton has been implemented using the combinator
+parser.
 
-Further, we define a default constructor, the relevant parameters/instance
-variables, and how these relate to the type parameter. As is readily
-apparent, these are a root of type \texttt{T}, and a sequence (list) of
-subtrees, each having the same type parameter.
+By restricting the rule set such that each left-hand side appears at most
+once, we arrive at the deterministic variant of bottom-up tree automata
+(BUDFTA). The expressive power of BUDFTA is exactly equal to BUNFTA, though
+the proof of this assertion is outside the scope of this introduction. It
+may be briefly mentioned that the proof by construction is similar to the
+proof of the equivalence of deterministic and non-deterministic string
+automata.
 
-\begin{verbatim}
-	/** Substitute all occurances of a certain symbol for a tree over the
-	 *  same type (or a supertype) returns a tree over the new type
-	 */
-	def subst[U >: T](sym : U,sub : Tree[U]) : Tree[U] = {
-		subst(Map[U,Tree[U]]((sym ,sub)))
-	}
+Moving on to the top-down case, a \emph{top-down deterministic finite tree
+automaton (TDNFTA)} is a 4-tuple $A = (\Sigma, Q, R, q_0)$ where
+\begin{compactitem}
+\item $Q$ is a ranked alphabet of states such that $Q = Q_1$
+%\item $F \subset Q$ is a ranked alphabet of final state such that $F = F_0$
+\item $\Sigma$ is the (ranked) tree alphabet
+\item $q_0$ is the initial state and 
+\item $R$ is a set of rules on form
+$q[a[v_1 \ldots v_k]] \rightarrow q_1[v_1] \ldots  q_k[v_k]$
+where $q, q_1 \ldots q_k \in Q, a \in \Sigma_k$, $v_1 \ldots v_n$
+are variables,
+\end{compactitem}
+\vspace{0.5cm}
 
-	/** Substitute all occurances of certain symbols for designated 
-	 *  trees over the same type (or a supertype) returns a tree over the
-	 *  new type
-	 */
-	def subst[U >: T](subs : Map[U,Tree[U]]) : Tree[U] = {
-		if(subs isDefinedAt root)
-			subs(root)
-		else
-			new Tree[U](root,subtrees map(_.subst(subs)) toList)
-	}
-\end{verbatim}
+Again, the Marbles implementation stays close to what is defined in the
+theory, with the variables being names \texttt{sigma}, \texttt{state},
+\texttt{rules} and \texttt{q0}, respectively, with the rule set being a
+\texttt{Map[(T,String),Set[Seq[String]]]}. The one thing to note is that
+the right-hand sides are contained in a \texttt{Set} of \texttt{Seq}s. That
+is, the state that the automaton uses to traverse downward is dependent on
+what state is applied to the sibling trees. The distinction may seem
+unimportant, but as will be apparent, it is critical to how the tree
+automaton works non-deterministically.
 
-%TODO: SHould this be straight symbol substitution?
+A configuration of a TDNFTA $A$ on a tree $t$ is a 4-tuple $C = (A, t, \Sigma', t')$
+where 
+\begin{compactitem}
+\item $A$ and $t$ are as in BUDFTA configurations,
+\item $\Sigma'$ is a ranked alphabet where $\Sigma'_k = \Sigma_k$ for $k \neq 1$ and
+$\Sigma'_1 = \Sigma_1 \cup Q$ and
+\item $t' \in T_{\Sigma'}$ is a position tree where in the path from the
+root to each leaf there is at most one symbol in $Q$.
+\end{compactitem}
+\vspace{0.5cm}
 
-These functions allow us to apply a simple substitution to the tree, that
-is, in this tree and all subtrees, we can replace any instance of a
-specific symbol by a tree, erasing the previous subtree rooted at that
-node. Alternatively, we can do several of these at once, using the second
-form. Finally, and most importantly, while we cannot change the type of the
-resulting tree to \emph{any} type, as long as the symbol type is a subclass
-of the substitute class (the \texttt{[U >: T]} restriction on the type
-parameter), the transformation still makes sense. 
+A run of the TDNFTA $A$ on a tree $t$ is sequence of configurations $C_0
+\ldots C_l$ where for each pair $C_n, C_{n-1}$, $A$, $t$, $\Sigma'$ are
+equal and for each successive pair $C_n$, $C_{n-1}$, $t'_n$ and $t'_{n-1}$
+relate to each other as follows: 
+\begin{compactitem}
+\item There is a subtree $q[a[t_1 \ldots t_k]]$, $q \in Q$ at position $p$
+in $t'_{n-1}$
+\item there is a subtree $a[q_1[t_1] \ldots q_k[t_k]]$ at position $p$ in
+$t'_{n}$
+\item $t'_{n-1}$ and $t'_n$ are otherwise equal, and
+\item there is a rule $q[a[v_1 \ldots v_k]] \rightarrow q_1[v_1] \ldots
+q_k[v_k]$ in $R$ 
+\item as an alternative, the subtrees may be $q[a]$ and $q'$, respectively,
+with the rule being $q[a] \rightarrow q$
+\end{compactitem}
+\vspace{0.5cm}
 
-For example, if the classes \texttt{Rectangle} and \texttt{Circle} both
-inherit from the class \texttt{Shape}, then a \texttt{Tree[Rectangle]}
-could have a susbtitution applied that changed, say, the first ten
-integer-sized squares to \texttt{Circles} instead, resulting in a
-\texttt{Tree[Shape]}.
+An accepting run ${C_0 \ldots C_n}$ of a TDNFTA $A$ on a tree $t$ is a run
+where in $C_0$, $t' = q_0[t]$, and in $C_n$, $t' \in T_\Sigma$, that is, no
+states remain in the intermediate tree.
 
-\begin{verbatim}	
-	/** Apply a function to every node of this tree.
-	 */
-	def map[To](f : (T) => (To)):Tree[To] = {
-		new Tree(f(root), subtrees map (_ map f))
-	}
-\end{verbatim}
+The set $L(A)$ of trees on which an accepting run can be constructed for the
+TDNFTA $A$ is the language accepted by $A$. TDNFTA recognise the regular
+tree languages, just as BUNFTA and BUDFTA. Deterministic top-down tree
+automata (TDDFTA) can be defined similarly to BUDFTA, that is, we restrict
+the rule set such that each left-hand side occurs at most once.
 
-While the substitution transformation is not required to substitute every
-possible symbol for another (indeed, they will often just substitute a
-few), the \texttt{map} method instead applies a function to each node in
-the tree, and returns the result. In many cases, the resulting type
-(\texttt{To}) will have no particular relation to the current tree type.
+TDDFTA recognise a subclass of the regular tree languages, i.e. there are
+regular tree languages for which no TDDFTA can be constructed. An example
+of such a language is the language ${f[a,b], f[b,a]}$. To prove this,
+assume that there is a rule $$q_0[f[v_1,v_2]] \rightarrow q[v_1], q[v_2]$$
+in $R$. This, however, means that in order for both $f[a,b]$ and $f[b,a]$
+to be in $L(A)$, there must be rules
+$$q[a] \rightarrow $$
+$$q[b] \rightarrow $$
+in $R$ as well, meaning that both $f[a,a]$ and $f[b,b]$ are in $L(A)$ as
+well, meaning that we are recognising the wrong language. It should be
+fairly obvious that it is both possible and, in fact, easy to construct a
+BUDFTA recognising the correct language.
 
-\begin{verbatim}
-	
-	/** Get the leaf trees of this tree
-	 */
-	def leaves:Seq[Tree[T]] = if(subtrees.size == 0)
-										this :: Nil 
-									else
-										subtrees flatMap (_.leaves)
-\end{verbatim}
+Further, by allowing non-determinism, we can amend the automaton to have
+the rule set
+$$q_0[f[v_1,v_2]] \rightarrow q_a[v_1], q_b[v_2]$$
+$$q_0[f[v_1,v_2]] \rightarrow q_b[v_1], q_a[v_2]$$
+$$q_a[a] \rightarrow $$
+$$q_b[b] \rightarrow $$
+allowing top-down automata to recognise the same language. Indeed, by
+inverting the sides of every rule and switching the initial state set $q_0$
+for the final state set $F$, any TDNFTA can be turned into a BUNFTA, and
+vice versa, meaning that non-deterministic top-down tree automata also
+recognise the class of regular tree languages. This should also clarify why
+the non-determinism in Marbles \texttt{TDNFTA} is implemented as a
+\texttt{Set} of \texttt{Seq}s instead of the other way around.
 
-This returns a left-to-right list of the leaves of the tree, in effect
-applying the \texttt{yield} function to the tree. Specific Scala constructs
-of note are using the cons operator (\texttt{::}) to create a list, and
-the \texttt{flatMap} function to first apply the function to each member of
-\texttt{subtrees} and then flattening the resulting lists
-(\texttt{[["a","b"],["c"]]} becomes \texttt{["a","b","c"]})
+\texttt{apply}, \texttt{isDeterministic}, and parsing all work similarly to
+how they work for \texttt{BUNFTA}, but \texttt{applyState} returns the
+result for processing a specified tree starting in a specified state. 
 
-\begin{verbatim}
-	override def toString : String = subtrees.size match { 
-		case 0 => root toString
-		case _   => root.toString + subtrees.mkString("[",",","]") 
-	}
+\subsubsection{Semirings and weighted automata}
 
-	override def equals(other : Any) = other match{
-		case that : Tree[_] => this.root == that.root &&
-							   this.subtrees == that.subtrees
-		case _ => false
-	}
+A \emph{semiring} is an algebraic structure, used to define \emph{weighted
+tree automata (WTA)}, and, using WTA, \emph{recognizable tree series}.
+Specifically, a semiring is a set $O$ equipped with two binary operations,
+$+$ and $\cdot$ (addition and multiplication), such that
+\begin{compactitem}
+\item $+$ is a commutative operation on $O$ with identity element $0$
+\item $\cdot$ is an operation on $O$ with identity element $1$
+\item $\cdot$ distributes over $+$, and
+\item multiplication with the additive identity $0$ annihalates $O$, that
+is, $a \cdot 0 = 0 \cdot a = 0$
+\end{compactitem}
 
-	override def hashCode = 41 * ( 41 + root.hashCode) + subtrees.hashCode
-}
-\end{verbatim}
+Marbles defines the \texttt{Semiring[T]} and \texttt{SemiringFactory[T]}
+traits which may be implemented by the user. Alternatively, one may use one
+of the predefined semirings provided in \texttt{semirings.scala}, that is
+either
+\begin{compactitem}
+\item the \texttt{Reals} semiring (basically the real numbers, with $+$, $\cdot$, $0$ and $1$ as would be expected.
+\item the \texttt{MaxPlus} semiring, with
+\subitem $0 = -\infty$
+\subitem $1 = 0$ 
+\subitem $+=$ \texttt{max}
+\subitem $\cdot=+$
+\item the Boolean semiring, with
+\subitem $0 =$ \texttt{false}
+\subitem $1 =$ \texttt{true}
+\subitem $+=$ \texttt{OR}
+\subitem $\cdot=$ \texttt{AND}
+\end{compactitem}
 
-Finally, we override some functions to make printing, comparisons and
-hashing possible. Without these, the standard \texttt{AnyRef} methods would
-be called instead, but these are based on object reference addresses, which
-is not suitable for most applications, though they are no doubt faster than
-the above methods. 
+Informally, a WTA is a function from $T_\Sigma$ to some semiring $O$, using
+the multiplication and addition formulas to compute a value from the
+subtrees. Using the previous definition of a BUNFTA as a basis, we extend
+this to the weighted case as follows:
 
-In addition to the class itself, there is a companion object defined for
-the \texttt{Tree} class:
-\begin{verbatim}
-/** Companion object for the Tree class. Contains factory and constructor
- *  methods, as well as extractors.
- */
-object Tree {
-	/** Standard factory method
-	 */
-	def apply[T](rt:T,ss:Seq[Tree[T]]) = new Tree(rt,ss)
-	
-	/** Factory for leaves
-	 */
-	def apply[T](rt:T) = new Tree(rt,Nil)
-	
-\end{verbatim}
+A \emph{bottom-up non-deterministic weighted tree automaton (BUNWTA)} is a
+5-tuple $A = (\Sigma, Q, R, F, O)$ where
+\begin{compactitem}
+\item $Q$, and $\Sigma$ are as in BUDFTA
+\item $F$ is a mapping from $Q$ to $O$ of \emph{final weights}
+\item $R$ is a set of rules on the form
+$a[q_1 \ldots q_k] \rightarrow q'$ for $q',q_1 \ldots q_k \in Q, a \in
+\Sigma_k$
+\end{compactitem}
+%todo: Write stuff on weighted automata, using Fülöp and Vogler?
 
-Including various factory methods in the companion object is standard
-practise for Scala classes. The special method name \texttt{apply} can be
-omitted in calls, i.e. \texttt{Tree(foo, bar)} is equivalent to
-\texttt{Tree.apply(foo, bar)}. Unsurprisingly, this is how function objects
-are defined in Scala. 
 
-\begin{verbatim}
-	/** Extracts the root and subtrees of a tree.
-	 */
-	def unapply[T](t:Tree[T]):(T,Seq[Tree[T]]) = (t.root,t.subtrees)
-\end{verbatim}
+\subsubsection{Generators}
 
-The special method \texttt{unapply} works as a sort of \texttt{apply} in
-reverse. Specifically, it can be used to extract information from arbitrary
-classes in pattern matching and similar situations. For example, you can do
-pattern matchin on \texttt{Tree}s as such:
+The ''inverse'' construct of recognisers are various kinds of
+\emph{grammars}. Notable in the string case is the \emph{context-free
+  grammar}, which is much more readily used to define context-free
+languages than the appropriate recogniser, the push-down automata.
+Likewise, the standard regular expression is as easily converted to a
+grammar as to a finite string automaton. For trees, the equivalent
+construction is the \emph{regular tree grammar}. While recognisers are
+reasonable to define in both a top-down and a bottom-up manner, it would be
+hard to know in advance how many leaves to start with in a bottom-up
+generator. Further, as with the string variants, deterministic grammars are
+obviously unreasonable, as such grammars would only define a single string
+or tree. Formally:
 
-\begin{verbatim}
-t match {
-  case Tree(root:T, Nil) =>  //Do something 
-  case Tree(root:U, Nil) =>  //Do something
-  case Tree(root:U, subtrees) =>  //Do something
-}
-\end{verbatim}
+A \emph{Regular tree grammar (RTG)} RTG is a 4-tuple $G = (\Sigma, N, R, S)$ where
+\begin{compactitem}
+\item $\Sigma$ is the ranked alphabet of \emph{terminal (output) symbols},
+\item $N$ is a ranked alphabet of \emph{non-terminal symbols} such that $N_0 = N$, 
+\item $R$ is a set of \emph{rules} on the form\\
+    $A \rightarrow t$, where $A \in N$ and $t$ is a tree over $\Sigma \cup N$, and
+\item $S \in N$ is the \emph{starting symbol}
+\end{compactitem}
 
-Again, this is largely syntactic sugar to make things more intuitive than
-would otherwise be possible.
+An \emph{intermediate tree} $t$ of an RTG $G$ is a tree over $\Sigma \cup N$.
 
-\begin{verbatim}
-	/** A parser for trees on the form "root[tree,...]" or "root" if the
-	 *  tree is a leaf. 
-	 */
-	implicit def treeParser[T](implicit rootParsers:ElementParsers[T]) = new ElementParsers[Tree[T]] {
-		val root:Parser[T] = rootParsers
-		def tree:Parser[Tree[T]] =
-			(root~opt("["~>repsep(tree,",")<~"]")) ^^ {
-				case root~None       => new Tree(root,Nil)
-				case root~Some(subs) => new Tree(root,subs)
-			}
+In Marbles, the class \texttt{RTGrammar} is more or less set up as
+expected, with the instance variables being named \texttt{sigma},
+\texttt{nonterminals}, \texttt{rules} and \texttt{start}, respectively.
+Intermediate trees are defined as \texttt{Tree[Either[String,T]]}, and
+\texttt{rules} is a \texttt{Map} from \texttt{String} to a \texttt{Set} of
+such trees.
 
-		def start = tree
-	}
-}
-\end{verbatim}
+A \emph{generation} of a tree $t \in T_\Sigma$ by the RTG $G$ is a sequence $t_0\ldots
+t_l$
+of intermediate trees of $G$ such that $t_0 = S$, $t_l = t$ and each pair
+$t_n, t_{n-1}$ are related to each other and $G$ as follows:
+\begin{compactitem}
+\item There is a nonterminal $A$ at position $p$ in $t_{n-1}$,
+\item there is an intermediate tree $t'$ at position $p$ in $t_n$,
+\item $t_{n-1}$ and $t$ are otherwise identical, and
+\item there is a rule $A \rightarrow t'$ in $R$.
+\end{compactitem}
 
-Finally, we define a parser for generic trees. This requires several tricks
-to work properly, and it is unknown what other language would be able to
-accomplish this so concisely. Specifically, the parser is defined
-\texttt{implicit}, meaning it can be accessed as an implicit argument to
-functions where it is in scope. The \texttt{treeParser} method also takes
-such an implicit argument, specifically a parser \texttt{root} of the
-symbol type \texttt{T}. The combinator parsing itself is somewhat obvious,
-in that it uses the \texttt{root} parser to parse the root of the specific
-subtree, and then optionally reads a \texttt{[}, followed by a number of
-subtrees separated by \texttt{,}.
+The \emph{language $L(G)$ generated by the RTG $G$} is the set of trees
+that can be generated by $G$. Though the proof is outside the scope of this
+thesis, it can be easily shown that RTG correspond exactly to BUNFTA, and
+thus is another way to define the regular tree languages.
 
-What is interesting to note is that the members of the companion object of
-type \texttt{T} is in scope to be included as implicit arguments, meaning
-that in order to allow any type to be included as symbols in trees, all
-that is required is to include an \texttt{ElementParsers} of the type in
-question in its companion object, and then apply the parameterised tree
-parser. Alternatively, you could explicitly include a parser as an argument
-to the tree parser. %TODO: expand?
+In Marbles, actual tree generation proved to be much more of a problem than
+anticipated. Briefly, there must be an order imposed on the rule set in
+order to iterate over it in some meaningful way. However, there is the
+additional requirement that no infinite recursion appears. Thus, the rules
+were ordered according to how many recursions are required to reach a tree
+in $T_\Sigma$. Now, we define a ''rule-choice'' tree, where the root is a
+choice of a specific rule among many, and the child trees are the
+successive choices of rules among the nonterminals in the intermediate tree
+resulting from that rule choice. Thus, iterating over the generated trees
+becomes a breadth-first search using these rule-choice trees, and then
+applying the rule choices as far as the search has gone. If any
+nonterminals remain below the level where the choices have been made, we
+choose to use the first rule, since this will terminate the recursion as
+fast as possible.
 
-In fact, the combinator parsers of the Scala standard library is sufficient
-for most of these tasks, but the \texttt{ElementParsers} class was required
-in order to allow the parsers to be properly utilised. In particular, type
-erasure and a few other issues made defining regular \texttt{Parser}s as
-implicit and utilising them properly a difficult, if not impossible, task.  
+%TODO: Illustrate?
 
-The Marbles prototype include parsers for \texttt{String}, \texttt{Int} and
-\texttt{Double} in the \texttt{marbles.util} package. See
-\texttt{Util.scala} for the specifics.
+\subsection{Transducers}
 
-For further details on Scala syntax and programming, the excellent book
-\textit{Programming in Scala} by Odersky et. al. is highly recommended. 
+Tree transducers are formalised automata that take a tree $t$ as input and
+use that to output a tree $t'$. Though not as extensively studied as the
+recogniser and generator classes given above, they nevertheless have seen
+use in various areas, notably natural language tasks such as translation
+(Knight, May). % TODO: others?
+
+As for recognisers, it is reasonable to define both bottom-up and top-down
+variants of tree transducers and it will be shown that both variants have
+interesting properties. Informally, we can think of tree transducers as
+tree recognisers that, apart from producing a state at each node, also
+procuce a tree. Additionally, there is a specified way the trees at each
+node are combined into one final output tree. More formally:
+
+A \emph{bottom-up finite tree transducer (BUFTT} is a 5-tuple $T = (\Sigma,
+\Delta, Q, R, F)$, where
+\begin{compactitem}
+\item $\Sigma$ is the (ranked) input alphabet,
+\item $\Delta$ is the (ranked) output alphabet,
+\item $Q$ is a set of states,
+\item $R$ is a set of rules on the form
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t']$$ where 
+$q,q_1,\ldots,q_k \in Q, s \in \Sigma_k, x_1,\ldots,x_k$ are variables, and
+$t' \in T_{\Delta \cup {x_1,\ldots,x_k}}$
+\item and $F \subset Q$ is a set of final states.
+\end{compactitem}
+
+As for the previous automata types, the Marbles equivalent is fairly close
+to the theoretical definition: \texttt{sigma}, \texttt{delta},
+\texttt{states} and \texttt{fin} all have the types you would expect, while
+\texttt{rules} is of the type \texttt{Map[(F,Seq[String]),Set[(VarTree[T],
+  String)]]}, where \texttt{F} is the type paremeter of the input alphabet,
+and \texttt{T} of the output alphabet. \texttt{VarTree[T]} is in principle
+a \texttt{Tree} over \texttt{Either[Int,T]}, though there are a number of
+extra methods implemented for easing the tasks associated with tree
+transducers. 
+
+An intermediate tree $t$ of a BUFTT $T$ is a tree over $\Sigma \cup \Delta
+\cup Q$, where $Q$ is seen as a ranked alphabet with $Q_1 = Q$. 
+
+A computation of a BUFTT $T$ is a sequence $t_1,\ldots,t_l$ of intermediate
+trees such that each pair $t_n, t_{n-1}$ relate to each other as follows:
+\begin{compactitem}
+\item there exists a tree $s[q_1[t_1],\ldots,q_k[t_k]]$ at position $p$ in
+$t_{n-1}$.
+\item there exists a tree $q[t'']$ at position $p$ in $t_n$
+\item $t_n$ and $t_{n-1}$ is otherwise equal,
+\item there is a rule $$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t']$$ in
+$R$, and
+\item $t''$ is the tree one obtains by taking $t'$ and substituting each
+instance of $x_1$ by $t_1$, each instance of $x_2$ by $t_2$, and so on.
+\end{compactitem}
+
+A successful computation of a BUFTT $T$ on a tree $t \in T_\Sigma$ is a
+computation $t_1,\ldots,t_l$ where $t_1 = t$ and $t_l = q[t_{out}$ where $q
+\in F$ and $t_{out} \in T_\Delta$. The trees $t$, and $t_{out}$ are the
+input and output trees, respectively, of this computation. As the BUFTT may
+be nondeterminstic, each input tree defines a set of output trees, and the
+BUFTT as a whole defines a relation $U$ on $T_\Sigma \times T_\Delta$, where
+$(t, t_{out}) \in U$ if there is a successful computation of $T$ such that
+$t$ and $t_{out}$ are its input and output trees.
+
+In Marbles, a \texttt{BUTreeTransducer[F,T]} inherits from the trait
+\texttt{TreeTransducer[F,T]}, which as of this writing is simply a
+''forwarding'' trait that inherits from
+\texttt{PartialFunction[Tree[F],Set[Tree[T]]]}. This inserts the transducer
+at the appropriate place in the Scala ecosystem, and allows one to use
+various interesting constructions, such as making a
+\texttt{RegularTreeGrammar}, and then \texttt{map}ping a tree transducer on
+top of it, to end up with an \texttt{Iterator} over the sets of output
+trees. Alternatively, by using \texttt{flatMap}, the individual trees are
+accessed. As for the other automata types, a parser is included in the
+companion object.
+
+In a similar way that BUNFTA relate to BUFTT do TDNFTA relate to
+\emph{top-down finite tree transducers (TDFTT)}. Formally:
+
+A top-down finite tree transducer (TDFTT) is a 5-tuple $T = (\Sigma,
+\Delta, Q, R, q_0)$, where
+\begin{compactitem}
+\item $\Sigma$ is the (ranked) input alphabet,
+\item $\Delta$ is the (ranked) output alphabet,
+\item $Q$ is a set of states,
+\item $R$ is a set of rules on the form
+$$q[s[x_1,\ldots,x_k]] \rightarrow t'$$ where
+$q \in Q, s \in \Sigma_k, x_1,\ldots,x_k$ are variables, and
+$t' \in T_{\Delta \cup Q \cup {x_1,\ldots,x_k}}$, where $Q$ is seen as a
+ranked alphabet with $Q = Q_1$
+\item and $q_0 \subset Q$ is a set of initial states.
+\end{compactitem}
+
+The Marbles implementation is again fairly close to the theory, but with
+\texttt{rules} being of a quite interesting type: \texttt{Map[(F,String),
+Set[(VarTree[T], Seq[(String, Int)])]]}. Here, \texttt{(F,String)}
+corresponds to the left-hand side quite obviously, but the right-hand side
+is more complex: Each \texttt{VarTree} has a number of variables that may
+be larger or smaller than the number of subtrees of $s$, so the \texttt{Seq} of
+\texttt{(String,Int)} records what state should be used for each particular
+variable, and what subtree of $s$ should be inserted at that point.
+Obviously, the \texttt{Seq} needs to have the same size as the amount of
+variables in the \texttt{VarTree}.
+
+We forego formal definitions of the computations of TDFTT at this time to
+focus on what makes TDFTT fundamentally different from BUFTT. In short:
+Instead of choosing a tree based on symbol and states from below, and
+inserting the subtrees at their respective places, we work from the top,
+transforming the tree and nondeterministically choosing the states and
+trees as we move downward.  This becomes relevant only when the transducer
+is \emph{non-linear}, in the sense that subtrees are copied during the
+processing. Specifically, in TDFTT, we can initiate processing of two
+copies of the same subtree using two different states, while in BUFTT any
+processing will already be complete by the time we are able to apply any
+copying. This important distiction means that there are relations that can
+be defined by BUFTT but not by TDFTT, and vice versa. This relationship
+will be further explored in Section \ref{ssec_tra nsducersplit}
 
 

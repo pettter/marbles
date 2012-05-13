@@ -5,7 +5,7 @@ import marbles.util._
 /** A TreeTransducer from F to T is a (potentially multivalued) function
  *  from trees over F to trees over T
  */
-trait TreeTransducer[F,T] {
+trait TreeTransducer[F,T] extends PartialFunction[Tree[F],Set[Tree[T]]]{
 	def apply(a:Tree[F]):Set[Tree[T]]
 //	def processTree(a:OrderedTree[F]):Unit
 //	def singleStep():Boolean

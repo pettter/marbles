@@ -103,6 +103,9 @@ class TDNFTA[T](sigma:RankedAlphabet[T],
 				case (tree,state) => applyState(tree,state)
 			}).foldLeft(true)(_.&&(_))
 		).foldLeft(false)(_.||(_))
+
+	/** Is this TDNFTA actually a deterministic automaton? */
+	def isDeterministic:Boolean = rules.values.filter( _.size != 1).isEmpty && q0.size == 1
 		
 	/** Any tree that conforms to the alphabet can be considered by the
 	 *  automaton.
@@ -227,6 +230,9 @@ class TDWFTA[T,R <: Semiring[R]](sigma:RankedAlphabet[T],
 			}).reduceLeft(_.+(_))
 		).reduceLeft(_.+(_))
 		}
+		
+	/** Is this TDNWTA actually a deterministic automaton? */
+	def isDeterministic:Boolean = rules.values.filter( _.size != 1).isEmpty
 		
 	/** Any tree that conforms to the alphabet can be considered by the
 	 *  automaton.

@@ -68,6 +68,7 @@ class BUNFTA[T](val sigma:RankedAlphabet[T],
 		ret.append("\nFinal states: "+fin)
 		ret.toString
 	}
+
 	/** A BUNFTA is a function determining whether a tree is in the
 	 *  language specified by the automaton or not
 	 */
@@ -80,6 +81,10 @@ class BUNFTA[T](val sigma:RankedAlphabet[T],
 		val stateseqs = Util.cartSet(tree.subtrees map applyState)
 		(stateseqs flatMap (seq => rules.get((tree.root,seq)))) flatten 
 	}
+
+	/** Is this BUNFTA actually a deterministic automaton? */
+	def isDeterministic:Boolean = rules.values.filter( _.size != 1).isEmpty
+
 
 	/** The tree can be considered by the automaton if it conforms to the
 	 *  alphabet.
@@ -227,6 +232,9 @@ class BUWFTA[T,R <% Semiring[R]](
 		(respairs.groupBy(_._1) map { case (lhs,rhss) =>
    			(lhs,(rhss map (_._2)) reduceLeft ((x,y) => x + y))}).toSet
 	}
+
+	/** Is this BUNWTA actually a deterministic automaton? */
+	def isDeterministic:Boolean = rules.values.filter( _.size != 1).isEmpty
 
 	/** The tree can be considered by the automaton if it conforms to the
 	 *  alphabet.

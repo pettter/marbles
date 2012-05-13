@@ -56,7 +56,7 @@ object RTGrammar {
 class RTGrammar[T](val sigma:RankedAlphabet[T],
     val nonterminals:Set[String],
     val rules:Map[String, Set[Tree[Either[String,T]]]],
-    val start:String){
+    val start:String) extends Iterator[Tree[T]]{
 
 
   /* Map how many nonterminals need to be traversed to result in a "ground
@@ -75,7 +75,11 @@ class RTGrammar[T](val sigma:RankedAlphabet[T],
    * considering the number of nonterminals required to be passed to a
    * ground term as the "size" */
   val internRules = rules map { case (x,y) => (x,y.toList.sortBy (
-	_.leaves.collect ( _.root match { case Left(x) => ntDepthMap(x) }) max
+	_.leaves.collect ( _.root match { case Left(x) => ntDepthMap(x) })
+	match {
+	  case List() => 0 //Empty does not like max
+	  case x => x max
+	}
 	))} 
 
   /* Calculate the "NT-size" of each nonterminal */
@@ -217,6 +221,9 @@ class RTGrammar[T](val sigma:RankedAlphabet[T],
     step()
     current
   }
+
+  /* Currently, we will never run out of trees. */
+  def hasNext = true
 
   /* Recurion step for the derivation from position to actual tree */
   def currentRecurse(t   : Tree[Either[String,T]],

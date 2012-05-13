@@ -2,6 +2,7 @@ package marbles.automaton
 import marbles.util._
 
 
+// TODO: refactor Automaton -> Recogniser
 trait TreeAutomaton[T,R] 
 	extends PartialFunction[Tree[T],R]
 

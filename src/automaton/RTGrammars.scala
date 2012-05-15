@@ -17,15 +17,15 @@ object RTGrammar {
     new ElementParsers[RTGrammar[T]] {
       val tp:Parser[T] = tps
 
-      def begin:Parser[String] = "RTG{"~nonTreeParser~"," ^^ { case _~nt~_ => nt }
+      def start:Parser[String] = nonTreeParser
 
       def rule = nonTreeParser ~ "|" ~
 	Tree.treeParser[Either[String,T]](ElementParsers.either(new
 	      ElementParsers[String] {
 	      def nonterminal:Parser[String] = "|"~nonTreeParser ^^ { case "|"~nt => nt}
 	      def start = nonterminal
-	      }, tps))~"," ^^ {
-	  case nt~"|"~t~"," => (nt,t)
+	      }, tps)) ^^ {
+	  case nt~"|"~t => (nt,t)
 	}
 
       def rules = rep(rule) ^^ (rs => {
@@ -40,10 +40,10 @@ object RTGrammar {
 	"{"~>RankedAlphabet.alphaParsers[T](tps)<~"},"
 
 
-      def rtg = begin~
+      def rtg = start~
 	alpha~"{"~
-	rules~"}"~"}" ^^ {
-	  case ss~alpha~_~rset~_~_ => new RTGrammar(alpha, rset.keySet, rset, ss)
+	rules~"}" ^^ {
+	  case ss~alpha~_~rset~_ => new RTGrammar(alpha, rset.keySet, rset, ss)
 	}
 
 
@@ -56,7 +56,7 @@ object RTGrammar {
 class RTGrammar[T](val sigma:RankedAlphabet[T],
     val nonterminals:Set[String],
     val rules:Map[String, Set[Tree[Either[String,T]]]],
-    val start:String) extends Iterator[Tree[T]]{
+    val start:String) extends TreeGenerator[T]{
 
 
   /* Map how many nonterminals need to be traversed to result in a "ground

@@ -45,7 +45,13 @@ object RankedAlphabet {
  */
 class RankedAlphabet[T] (val map:scala.collection.Map[T,Int]) {
 
-	override def toString:String = map.toString
+	override def toString:String = {
+	  val ret:StringBuilder = new StringBuilder("{")
+	  map foreach {case (s,r) => ret.append(s+"|"+r+",") }
+	  ret.stripSuffix(",") + "}"
+	}
+
+
 
 	/** Get the rank of a symbol
 	 */

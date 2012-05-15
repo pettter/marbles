@@ -61,11 +61,12 @@ class BUNFTA[T](val sigma:RankedAlphabet[T],
 
 	override def toString:String = {
 		var ret:StringBuilder = new StringBuilder( 
-		  "Sigma       : "+sigma+
-		"\nStates      : "+states+
-		"\nRules       :\n")
-		rules foreach {case (lhs,rhs) => ret.append("    "+lhs+" | "+rhs+"\n")}
-		ret.append("\nFinal states: "+fin)
+		  "BUNFTA:\n"+
+		  sigma+"\n"+
+		states.mkString("{",",","}\n"))
+		rules foreach {case ((s,qs),rhs) =>
+		  ret.append(s+qs.mkString("[",",","]")+"|"+rhs.mkString("{",",","}")+"\n")}
+		ret.append(fin.mkString("{",",","}"))
 		ret.toString
 	}
 

@@ -2,7 +2,8 @@ package marbles
 package automaton
 import marbles.util.Tree
 
-trait TreeGrammar[T]
+
+trait TreeGenerator[T]
 	extends Iterator[Tree[T]]
 //
 //

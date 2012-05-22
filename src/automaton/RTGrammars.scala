@@ -17,7 +17,7 @@ object RTGrammar {
     new ElementParsers[RTGrammar[T]] {
       val tp:Parser[T] = tps
 
-      def start:Parser[String] = nonTreeParser
+      def ss:Parser[String] = nonTreeParser
 
       def rule = nonTreeParser ~ "|" ~
 	Tree.treeParser[Either[String,T]](ElementParsers.either(new
@@ -40,7 +40,7 @@ object RTGrammar {
 	"{"~>RankedAlphabet.alphaParsers[T](tps)<~"},"
 
 
-      def rtg = start~
+      def rtg = ss~
 	alpha~"{"~
 	rules~"}" ^^ {
 	  case ss~alpha~_~rset~_ => new RTGrammar(alpha, rset.keySet, rset, ss)

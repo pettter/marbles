@@ -1,18 +1,190 @@
 \section{Results}
 
-While the codebase introduced in Section \ref{sec_method} is potentially
-sufficient to express the automata types themselves, the goal of Marbles is
-to do algorithms on the automata, not just use them in calculations as-is.
-The fact that implementation of automata closely resembles the theoretical
-bases lends credence that this would, in fact, be possible, if not easy. It
-may be in order, once again, to 
+In order to demonstrate that the implmemented prototype actually serves the
+intended purpose (i.e. as a means to quickly and easily test algorithms on
+various tree automata), several algorithms on tree automata were
+implemented. During the implementation work, certain implementation
+problems seemed to be common for most if not all algorithm implementations. 
 
 \subsection{Functionalising tree automata algorithms}
 
+While it is quite possible to use an imperative programming style even in
+Scala, the language is designed to be used in a functional way, and many
+aspects of the collections framework among others have plenty of methods
+and structures that allow for easy functional programming. This can be
+contrasted to many if not most descriptions of algorithms in the
+literature, where imperative pseudocode seems prevalent.
+
 \subsection{Example algorithms}
 
-\subsubsection{Top-down transducer splitting}
+\subsection{Further transducer background}
+
+In order to properly appreciate the example transducer splitting
+algorithms, we require some more theory and definitions. Recall the
+definitions in Subsection \ref{ssec_transducerdef}. By placing constraints
+on the structures, we can find different classes of tree transductions.
+Specifically, we call the class of tree transductions definable by TDFTT
+$\mathbf{T}$, and by BUFTT, $\mathbf{B}$. Further, by restricting the
+number of rules with the same left-hand side to at most one, we arrive at
+the \emph{deterministic} TDFTT and BUFTT, respectively, the classes of
+transductions definable by these are denoted by $\mathbf{DT}$ and
+$\mathbf{DB}$. Note that two left-hand sides are equal if they incorporate
+the same symbol and the same state(s), regardless of how the variables are
+named.
+
+Additionally, we define the following constraints:
+\begin{compactitem}
+\item A transducer is \emph{total deterministic}, if there is exactly one
+right-hand side for each possible left-hand side. %TODO "possible" necessary?
+\item A transducer is \emph{linear}, if each variable that occurs on the
+left-hand side of a rule occurs at most once in each right-hand side. 
+\item A transducer is \emph{non-deleting}, if each variable that occurs on
+the left-hand side of a rule occurs at least once in each right-hand side.
+\item A transducer is single-state, or \emph{pure}, if $|Q| = 1$.
+\end{compactitem}
+
+By prepending $\mathbf{D_t}$, $\mathbf{L}$, $\mathbf{N}$, and $\mathbf{P}$
+to $\mathbf{T}$ or $\mathbf{B}$, we denote the class of transductions
+defined by TDFTT and BUFTT with the above constraints, respectively. For
+example, $\mathbf{DLB}$ is the class of transductions definable by
+deterministic linear BUFTT. 
+
+In Subsection \ref{ssec_transducerdef}, we briefly mentioned that there
+were transductions that could be defined by a BUFTT but not by a TDFTT, and
+vice versa, i.e. that $\mathbf{T}$ and $\mathbf{B}$ are incomparable, that
+is
+$$\mathbf{T} \subsetneq \mathbf{B}$$
+We further mentioned that the defining differences between BUFTT and TDFTT
+were that BUFTT can process an input subtree nondeterministically, and then
+copy the results using a later rule, alternatively discard the results
+entirely.  TDFTT, by contrast, can copy an input subtree \emph{first}, and
+then apply different states to the two outputs, or alternatively use the
+same state, but do processing in the two copies with nondeterminstic
+differences.
+
+It would seem natural to use the restrictions detailed above to find a
+''natural'' common subset of transductions to $\mathbf{T}$ and
+$\mathbf{B}$. As it turns out, several such common subsets exist:
+
+First of all, we note that by eliminating copying of subtrees (i.e.
+imposing linearity), all that makes TDFTT more powerful than BUFTT is
+eliminated, that is
+$$\mathbf{LT} \subset \mathbf{LB} \subset \mathbf{B}$$
+
+Further restricting the deletion of subtrees would seem to eliminate any
+advantage to using BUFTT as well, leading us to state that
+$$\mathbf{NLB} = \mathbf{NLT} \subset \mathbf{LT}$$
+
+This equality relation is not immediately applicable in this thesis, but an
+important subset of this class of transductions is, namely that of
+\emph{finite state relabelings} ($\mathbf{QREL}$), where we further
+restrict the right-hand sides of rules such that rules of TDFTT have the
+form:
+$$q[s[x_1,\ldots,x_k]] \rightarrow s'[q_1[x_1],\ldots,q_k[x_k]]$$ 
+and of BUFTT have the form
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[s'[x_1,\ldots,x_k]$$
+
+A different subset of both $\mathbf{B}$ and $\mathbf{T}$ can be obtained by
+restricting the actual passing of (state) information, as long as no
+non-deterministic copying is allowed. That is, 
+$$\mathbf{PD_tB} = \mathbf{PD_tT}$$
+Again, a formal proof is outside the scope of this thesis, but the equality
+is well-known. This set is also known as the set of \emph{tree homomorphisms} 
+($\mathbf{HOM}$).
+
+While algorithms or properties could relatively easily be implemented in
+Marbles to identify homomorphisms and finite state relabelings, this is not
+currently available.
+
+If $\mathbf{A}$ and $\mathbf{B}$ are classes of transductions, let
+$\mathbf{A}\circ\mathbf{B}$ denote the class of transductions possible by
+applying first a transduction from $\mathbf{A}$, and then applying one from
+$\mathbf{B}$ to the result, that is we \emph{compose} a transduction in
+$\mathbf{A}$ with one in $\mathbf{B}$. It is well-known that while string
+transductions are closed under composition (that is, you gain no additional
+possible string transductions by using two transducers rather than one),
+the same is not true for tree transducers, that is
+$$\mathbf{T} \subset \mathbf{T} \circ \mathbf{T}$$ and
+$$\mathbf{B} \subset \mathbf{B} \circ \mathbf{B}$$
+
+However, it is further known that every TDFTT can be represented by a
+tree homomorphism followed by a linear TDFTT, both of which can be
+represented by BUFTT. In addition, each BUFTT can be represented by a
+finite state relabeling, followed by a tree homomorphism. That is,
+$$\mathbf{T} \subset \mathbf{HOM} \circ \mathbf{LT} \subset \mathbf{B}
+\circ \mathbf{B}$$ and
+$$\mathbf{B} \subset \mathbf{QREL} \circ \mathbf{HOM} \subset \mathbf{T}
+\circ \mathbf{T}$$
+
+In the following sections, we will describe and implement algorithms that
+can be used in constructive proofs of the last of the above statements.
 
 \subsubsection{Bottom-up transducer splitting}
+
+Recall that a BUFTT is a 5-tuple $B = (\Sigma, \Delta, Q, R, F)$, and
+a TDFTT is a 5-tuple $T = (\Sigma, \Delta, Q, R, q_0)$,
+as defined in Subsection \ref{ssec_transducerdef}. The idea of the BUFTT
+decomposition algorithm is to define a ''transitional'' alphabet, which
+is used by the finite state relabeling to store information indicating by
+which tree-piece the node should be replace to produce the final output
+tree. After that, a homomorphism is used to actually apply the
+replacements. Formally,
+
+\begin{itemize}
+\item Let $B = (\Sigma, \Delta, Q, R, F)$ be the (input) BUFTT, then
+
+\item $\Omega$ is the transitional alphabet, defined as follows: if 
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t]$$ is a rule in $R$, then
+$d_{t}$ is a (new) symbol in $\Omega_k$.
+
+\item We define the TDFTT $T_1 = (\Sigma, \Omega, Q, R_1, F)$, a
+finite state relabeling, with $R_1$ defined as follows: if 
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t]$$ is a rule in $R$, then
+$$q[s[x_1,\ldots,x_k]] \rightarrow d_{t}[q_1[x_1],\ldots,q_k[x_k]] \in R_1$$
+
+\item We define the TDFTT $T_2 = (\Omega, \Delta, {q_s}, R_2, {q_s})$, a tree
+homomorphism, with $R_2$ defined as follows: $$\forall d_t \in \Omega:
+q_s[d_t[x_1,\ldots,x_k]] \rightarrow t' \in R_2$$ where $t'$ is the tree obtained by
+replacing each element of $Q$ in $t$ by $q_s$, that is, the single state of
+$T_2$.
+\end{itemize}
+
+Note that $\Omega$ is finite, as $R$ has a finite number of right-hand
+sides. Further, looking at the rules in $R_1$, they all conform to the
+pattern specified for TDFTT implementing finite state relabelings, meaning
+that the transduction defined by $T_1$ is in $\mathbf{QREL}$. For $T_2$,
+note that $Q$ is a singleton, and that we define exactly one rule in $R_2$
+for every possible left-hand side, meaning that the transduction defined by
+$T_2$ in in $\mathbf{PD_tT = HOM}$.
+
+As for the equality $L(B) = L(T_1 \circ T_2)$, we sketch a proof by
+induction on the input tree $t$:
+
+\begin{itemize}
+\item First, note that due to the initial states of $T_1$ being $F$, it is
+suffient to prove that if there is a derivation by $B$ on a subtree $t$
+that can end up in $q[t']$, with $t' \in T_\Delta$, then $T_1 \circ T_2$,
+with $T_1$ starting in state $q$, will end up producing the same $t'$.
+
+\item Consider the case where $t = s$, that is, the input is a single leaf.
+The result from $B$, started on $t$, is then the set $qts = {q[t']: s \rightarrow
+ q[t'] \in R}$. For each such right-hand side we expect that $T_1 \circ T_2$,
+started in $q$, and run on $s$ will produce ${t' : q[t'] \in qts}$. By
+looking at the definitions of $\Omega$, $R_1$ and $R_2$, we see that $T_1$,
+ran on $q[s]$, will output the set of trees $dts = {d_t : q[s] \rightarrow d_t
+  \in R_1}$, further, $T_2$ will transform each of these trees to the
+''embedded'' set of trees ${t : d_t \in dts}$. By the definitions of $R_1$,
+$R_2$ and $\Omega$, this is exactly the set ${t' : q[t'] \in qts}$.
+
+\item Moving on to the case of $t = s[t_1,\ldots,t_k]$, we know that $B$,
+started on $t$ will produce a set $qts = {q[t']: s[x_1,+ldots,x_k]
+  \rightarrow q[t'] \in R}$. For
+each such right-hand side
+
+\end{itemize}
+
+
+
+\subsubsection{Top-down transducer splitting}
 
 

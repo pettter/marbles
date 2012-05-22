@@ -1,5 +1,3 @@
-\section{Introduction}
-
 %XXX This might be more of an abstract...
 In \cite{drewes_marbles}, Drewes outlines Marbles, a programming framework
 for working in a generic and systematic way, not only on trees, as several
@@ -9,52 +7,97 @@ tree automata). This thesis focuses on a proposed implementation of this
 framework, with special focus on the choice of language and ease of
 extension.
 
-Formal tree language theory is an active area of research that is
-continually finding new applications within such diverse subjects as model
-checking, compiler design and natural language processing. 
-
-The theoretical basis of formal tree language theory is the regular string
-automata theory popularised and expanded by Chomsky, Shützenberger et. al.
-in the 1950's. Specifically, the automata hierarchies of the string cases
-have rough equivalents when working on trees, and many results that hold
-for the string case are applicable to the tree case. 
-
-Trees and tree automata has been an area of finite-automata theoretical
-research since the 1960's, when researchers realised that large parts of
-traditional string automata theory could be extended by replacing strings
-with trees. Through finding ever more applications in recent years, the
-area sees more research than ever before. 
-
-Implementation of various tree automata and the algorithms working on same
-have been fragmented, however, and data and code exchange has suffered as a
-result. Several efforts are nevertheless worthy of mention, not least the
-Treebag\cite{drewes_treebag} system, as Marbles is in a large part based on
-ideas from that project.
 
 
-This section will continue with a general introduction to the subject
-of the thesis, including a discussion on previous work in the area and an
-introduction to the goals of the thesis project. Section
-\ref{sec_preliminaries} will dig deeper into the theoretical fundaments
-required for the rest of the thesis, while Section \ref{sec_method} will
-describe the method used to reach the project goals. This section will also
-include a discussion on the choice of programming language, as well as the
-basic architecture of the prototype system.
 
-Section \ref{sec_results} will discuss the resulting system, and some of
-the implications of the choices made in the prototyping process. In
-particular, how the implementation of certain algorithms differ from their
-generic description. Further, several proof-of-concept algorithm
-implementations will be presented and discussed.
+\section{Introduction}
 
-Finally, Section \ref{sec_conclusions} will contain a number of closing
-remarks, and introduce the next steps in making the prototype into an
-actual working framework, useable for research purposes.
+Techniques based on trees and various tree formalisms have seen increasing
+use in many areas in recent years. Perhaps most well-known is the
+propensity for using XML as a data exchange medium, but tree-based
+techniques have found its place in many other areas, such as natural
+language processing, model checking, and compiler optimisation.
 
-\subsection{Motivation and previous work}
+Tree techniques, and specifically tree automata techniques are largely
+based in the work done by Chomsky et. al. in exploring various string
+formalisms and their respective restrictions, such as the Chomsky
+hierarchy. During the 1960's, reserarchers started exploring whether the
+results obtained in string automata theory and formal languages could
+somehow be extended to trees. As the case was, they could, and since then,
+tree automata research has been an ever growing area of research, though
+practical applications of this research is much more recent.
+
+\subsection{Motivation}
+
+Part of the reason for the lack of application may be attributed to poor
+programming language support. While regular expressions have been an
+integral part of the UNIX system through command line utilities such as
+\texttt{ed} and \texttt{sed}, and later through programming languages such
+as Perl, comparable tree techniques have been mostly absent or bulky to
+use, both in programming and end user applications.
+
+This lack of programming support has also had a noticeable impact on the
+research. String data exchange has been fairly standardised ever since the
+ASCII standard was formulated in TODO (with some notable exceptions such as
+EBCDIC), which in turn is superceded by Unicode. The only comparable
+standard seems to be XML, which was only finally incorporated as a standard
+in TODO. XML does not solve the problem of programming language support for
+working on trees, however, and various research groups have in many cases
+been left to implement the basics of their own tools separately. 
+
+The focus of this thesis is a proposed solution to the identified problem.
+The Tree Automata Workbench Marbles, introduced by Drewes in \cite{TODO},
+is intended to be an extensible and generic programming framework for
+working on not only trees, but tree automata of various types.
+Specifically, three main groups of tree automata can be identified:
+
+\begin{compactitem}
+\item generators, that produce trees in some well-specified way (usually a
+grammar of some sort),
+\item recognisers, formal devices that takes a tree and produces some
+resulting value. These can be a boolean truth value on if the tree belongs
+to a certain language or not, but could in theory be almost anything.
+\item transducers, which use a tree as the input, and produces a (usually
+different) tree as output.
+\end{compactitem}
+
+\subsection{Previous work}
+
+Of course, several projects exist which allow for working on trees and tree
+automata in various capacities, though most, as mentioned, are somewhat
+narrow in scope, or are not presented in a more organised fashion, but
+rather used informally within the confines of a research group.
+
+Certain tools have seen more wide distribution, though, and some of these
+have served as an inspiration for the ideas behind Marbles.
+
+\begin{itemize}
+\item \textbf{Treebag} is a workbench for working with tree generators and
+transducers, stepping through derivations and transductions and inspecting
+the effects on the tree. It is further possible to write algebras that work
+on the trees to produce some output. The specific context for which Treebag
+was developed was tree-based picture generation, but it is useable for many
+other tasks relating to trees and tree generators as well. Treebag is in
+many ways an ancestor to Marbles, having the same originator and the same
+ambition of generality.
+\item \textbf{ForestFire} is a toolkit for pattern-matching and tree
+acceptance problems, with various algorithms organised into taxonomies. 
+\item \textbf{Tiburon} is a package of algorithms for working on various
+kinds of tree automata, notably weighted tree transducers and regular tree
+grammars. Though the focus is on natural language processing and related
+problems in machine learning, the algorithms are general enough to
+potentially see use in certain other domains as well.
+\item \textbf{Timbuk} is a collection of tools for working on reachability
+proofs for term rewriting systems. Recent versions (3.0 and onwards)  no
+longer include the tree automata manipulation tools that warrants its
+inclusion here, but older versions include various algorithms for emptiness
+checking, boolean operations such as automata intersection, union,
+inversion etc. 
+\end{itemize}
+
+\subsection{Marbles}
 
 
-%TODO: previous work
 
 \subsection{Project goals}
 
@@ -83,6 +126,24 @@ implementation work, with a view to eventually be expanded into the
 complete framework.
 \end{compactitem}
 
+
+\subsection{Outline}
+
+Section \ref{sec_preliminaries} will dig deeper into the theoretical
+fundaments required for the rest of the thesis, while Section
+\ref{sec_method} will describe the method used to reach the project goals.
+This section will also include a discussion on the choice of programming
+language, as well as the basic architecture of the prototype system.
+
+Section \ref{sec_results} will discuss the resulting system, and some of
+the implications of the choices made in the prototyping process. In
+particular, how the implementation of certain algorithms differ from their
+generic description. Further, several proof-of-concept algorithm
+implementations will be presented and discussed.
+
+Finally, Section \ref{sec_conclusions} will contain a number of closing
+remarks, and introduce the next steps in making the prototype into an
+actual working framework, useable for research purposes.
 
 
 
@@ -123,3 +184,24 @@ complete framework.
 %of this thesis, it is nevertheless a prerequisite for the end goal. 
 %
 %That end goal
+%Formal tree language theory is an active area of research that is
+%continually finding new applications within such diverse subjects as model
+%checking, compiler design and natural language processing. 
+%
+%The theoretical basis of formal tree language theory is the regular string
+%automata theory popularised and expanded by Chomsky, Shützenberger et. al.
+%in the 1950's. Specifically, the automata hierarchies of the string cases
+%have rough equivalents when working on trees, and many results that hold
+%for the string case are applicable to the tree case. 
+%
+%Trees and tree automata has been an area of finite-automata theoretical
+%research since the 1960's, when researchers realised that large parts of
+%traditional string automata theory could be extended by replacing strings
+%with trees. Through finding ever more applications in recent years, the
+%area sees more research than ever before. 
+%
+%Implementation of various tree automata and the algorithms working on same
+%have been fragmented, however, and data and code exchange has suffered as a
+%result. Several efforts are nevertheless worthy of mention, not least the
+%Treebag\cite{drewes_treebag} system, as Marbles is in a large part based on
+%ideas from that project.

@@ -7,6 +7,16 @@ from string languages is simple - simply allow more than one successor to
 each symbol - but obviously this is not sufficiently well-defined to
 function very well, formally.
 
+%\subsection{Notation}
+%
+%Throughout this thesis, unless otherwise specified
+%\begin{compactitem}
+%\item $\Sigma$ and $\Delta$ will refer to alphabets,
+%\item $k,l,n$ and $i$ will refer to integers,
+%\item $s, s'$ will refer to symbols,
+%\item $q, q', q_1 \ldots q_k$ will refer to states,
+%\end{compactitem}
+
 \subsection{Introduction to trees and automata theory}
 
 We define an \emph{alphabet} to be any nonempty set $\Sigma$ of
@@ -36,13 +46,13 @@ alphabet $\Sigma$} is the set of strings defined inductively as follows
 \end{compactitem}
 
 \begin{figure}[htb]
-\label{fig_tree}
 \center
 \includegraphics[scale=0.5]{tree.png}
 \caption{A simple graphical representation of the tree $a[b[c],d]$}
+\label{fig_tree}
 \end{figure}
 
-In the tree $t = a[b[c],d]$ (shown graphically in Figure \vref{fig_tree}, the
+In the tree $t = a[b[c],d]$ (shown graphically in Figure \vref{fig_tree}), the
 symbol $a$ is the root of the tree, while $b[c]$ and $d$ are
 \emph{child trees}, or \emph{direct subtrees}. The set of all subtrees of a
 particular tree, $subtrees(t)$, is composed inductively as follows:
@@ -57,6 +67,7 @@ Further, a tree with no direct subtrees (e.g. $d$), is called a
 set of symbols. A \emph{tree language} over $\Sigma$ is any subset of
 $T_\Sigma$, again, $\Sigma_0$ serves as an example, namely the tree
 language consisting of only leaves.
+
 
 The \textit{yield} of a tree $t \in T_\Sigma$ is the string over $\Sigma_0$
 obtained by reading the leaves of the tree from left to right. 
@@ -128,7 +139,7 @@ $q'_{n-1}[a] \rightarrow q'_n$
 in $R$, where $q'_{n-1} \in q_{n-1}$, $q'_n \in q_n$
 \end{compactitem}
 Similarly, the requirement for an accepting run to have $q \in F$ is
-amended such that $q \intersect F \neq \emptyset$.
+amended such that $q \cap F \neq \emptyset$.
 
 \subsubsection{Tree automata}
 

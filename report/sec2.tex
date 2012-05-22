@@ -17,7 +17,7 @@ system could be built, much thought was spent on the choice of language.
 Ideally, the language would be familiar to a large number of researchers,
 while having several desirable features, such as platform-independece, easy
 extensibility and a powerful typing system. Initially, the languages
-considered were C++, Java and Haskell (C# being seen as far too closely
+considered were C++, Java and Haskell (C\# being seen as far too closely
 tied to the Microsoft Windows platform). However, as C++ is both hard to
 distribute in a platform-independent form, and notoriously
 counterintuitive, the deliberations quickly centered on Java or Haskell,
@@ -48,14 +48,14 @@ and has a large standard library that handles much of the underlying
 complexities in various common tasks. 
 
 Everything in Scala is an object, down to the integral data types
-(\texttt{int} and so on), and functions. However, as opposed to Java or C#,
+(\texttt{int} and so on), and functions. However, as opposed to Java or C\#,
 there is no such thing as a static method. Instead, classes have so-called
 ''companion objects'', being in principle singletons, usually containing
 the static methods and constants, as well as various factory methods.
 Companion objects and their companion classes each have private access to
 the other.
 
-Probably the most significant difference between Scala and C#/Java is
+Probably the most significant difference between Scala and C\#/Java is
 multiple implementation inheritance. That is, while Java classes inherit
 only from a single class, but potentially multiple interfaces, each
 interface only describes methods that need to be present in the class, no
@@ -74,8 +74,8 @@ in the Marbles prototype:
 /** An ordered tree with nodes of a certain type
  */
 class Tree[+T] (val root : T, 
-		        val subtrees: Seq[Tree[T]]
-			) { 
+                val subtrees: Seq[Tree[T]]
+            ) { 
 \end{verbatim}
 
 This defines the \texttt{Tree} class as having a class parameter
@@ -90,23 +90,23 @@ apparent, these are a root of type \texttt{T}, and a sequence (list) of
 subtrees, each having the same type parameter.
 
 \begin{verbatim}
-	/** Substitute all occurances of a certain symbol for a tree over the
-	 *  same type (or a supertype) returns a tree over the new type
-	 */
-	def subst[U >: T](sym : U,sub : Tree[U]) : Tree[U] = {
-		subst(Map[U,Tree[U]]((sym ,sub)))
-	}
+    /** Substitute all occurances of a certain symbol for a tree over the
+     *  same type (or a supertype) returns a tree over the new type
+     */
+    def subst[U >: T](sym : U,sub : Tree[U]) : Tree[U] = {
+        subst(Map[U,Tree[U]]((sym ,sub)))
+    }
 
-	/** Substitute all occurances of certain symbols for designated 
-	 *  trees over the same type (or a supertype) returns a tree over the
-	 *  new type
-	 */
-	def subst[U >: T](subs : Map[U,Tree[U]]) : Tree[U] = {
-		if(subs isDefinedAt root)
-			subs(root)
-		else
-			new Tree[U](root,subtrees map(_.subst(subs)) toList)
-	}
+    /** Substitute all occurances of certain symbols for designated 
+     *  trees over the same type (or a supertype) returns a tree over the
+     *  new type
+     */
+    def subst[U >: T](subs : Map[U,Tree[U]]) : Tree[U] = {
+        if(subs isDefinedAt root)
+            subs(root)
+        else
+            new Tree[U](root,subtrees map(_.subst(subs)) toList)
+    }
 \end{verbatim}
 
 %TODO: SHould this be straight symbol substitution?
@@ -126,12 +126,12 @@ could have a susbtitution applied that changed, say, the first ten
 integer-sized squares to \texttt{Circles} instead, resulting in a
 \texttt{Tree[Shape]}.
 
-\begin{verbatim}	
-	/** Apply a function to every node of this tree.
-	 */
-	def map[To](f : (T) => (To)):Tree[To] = {
-		new Tree(f(root), subtrees map (_ map f))
-	}
+\begin{verbatim}    
+    /** Apply a function to every node of this tree.
+     */
+    def map[To](f : (T) => (To)):Tree[To] = {
+        new Tree(f(root), subtrees map (_ map f))
+    }
 \end{verbatim}
 
 While the substitution transformation is not required to substitute every
@@ -141,13 +141,13 @@ the tree, and returns the result. In many cases, the resulting type
 (\texttt{To}) will have no particular relation to the current tree type.
 
 \begin{verbatim}
-	
-	/** Get the leaf trees of this tree
-	 */
-	def leaves:Seq[Tree[T]] = if(subtrees.size == 0)
-										this :: Nil 
-									else
-										subtrees flatMap (_.leaves)
+    
+    /** Get the leaf trees of this tree
+     */
+    def leaves:Seq[Tree[T]] = if(subtrees.size == 0)
+                                        this :: Nil 
+                                    else
+                                        subtrees flatMap (_.leaves)
 \end{verbatim}
 
 This returns a left-to-right list of the leaves of the tree, in effect
@@ -158,18 +158,18 @@ the \texttt{flatMap} function to first apply the function to each member of
 (\texttt{[["a","b"],["c"]]} becomes \texttt{["a","b","c"]})
 
 \begin{verbatim}
-	override def toString : String = subtrees.size match { 
-		case 0 => root toString
-		case _   => root.toString + subtrees.mkString("[",",","]") 
-	}
+    override def toString : String = subtrees.size match { 
+        case 0 => root toString
+        case _   => root.toString + subtrees.mkString("[",",","]") 
+    }
 
-	override def equals(other : Any) = other match{
-		case that : Tree[_] => this.root == that.root &&
-							   this.subtrees == that.subtrees
-		case _ => false
-	}
+    override def equals(other : Any) = other match{
+        case that : Tree[_] => this.root == that.root &&
+                               this.subtrees == that.subtrees
+        case _ => false
+    }
 
-	override def hashCode = 41 * ( 41 + root.hashCode) + subtrees.hashCode
+    override def hashCode = 41 * ( 41 + root.hashCode) + subtrees.hashCode
 }
 \end{verbatim}
 
@@ -186,14 +186,14 @@ the \texttt{Tree} class:
  *  methods, as well as extractors.
  */
 object Tree {
-	/** Standard factory method
-	 */
-	def apply[T](rt:T,ss:Seq[Tree[T]]) = new Tree(rt,ss)
-	
-	/** Factory for leaves
-	 */
-	def apply[T](rt:T) = new Tree(rt,Nil)
-	
+    /** Standard factory method
+     */
+    def apply[T](rt:T,ss:Seq[Tree[T]]) = new Tree(rt,ss)
+    
+    /** Factory for leaves
+     */
+    def apply[T](rt:T) = new Tree(rt,Nil)
+    
 \end{verbatim}
 
 Including various factory methods in the companion object is standard
@@ -203,9 +203,9 @@ omitted in calls, i.e. \texttt{Tree(foo, bar)} is equivalent to
 are defined in Scala. 
 
 \begin{verbatim}
-	/** Extracts the root and subtrees of a tree.
-	 */
-	def unapply[T](t:Tree[T]):(T,Seq[Tree[T]]) = (t.root,t.subtrees)
+    /** Extracts the root and subtrees of a tree.
+     */
+    def unapply[T](t:Tree[T]):(T,Seq[Tree[T]]) = (t.root,t.subtrees)
 \end{verbatim}
 
 The special method \texttt{unapply} works as a sort of \texttt{apply} in
@@ -225,19 +225,19 @@ Again, this is largely syntactic sugar to make things more intuitive than
 would otherwise be possible.
 
 \begin{verbatim}
-	/** A parser for trees on the form "root[tree,...]" or "root" if the
-	 *  tree is a leaf. 
-	 */
-	implicit def treeParser[T](implicit rootParsers:ElementParsers[T]) = new ElementParsers[Tree[T]] {
-		val root:Parser[T] = rootParsers
-		def tree:Parser[Tree[T]] =
-			(root~opt("["~>repsep(tree,",")<~"]")) ^^ {
-				case root~None       => new Tree(root,Nil)
-				case root~Some(subs) => new Tree(root,subs)
-			}
+    /** A parser for trees on the form "root[tree,...]" or "root" if the
+     *  tree is a leaf. 
+     */
+    implicit def treeParser[T](implicit rootParsers:ElementParsers[T]) = new ElementParsers[Tree[T]] {
+        val root:Parser[T] = rootParsers
+        def tree:Parser[Tree[T]] =
+            (root~opt("["~>repsep(tree,",")<~"]")) ^^ {
+                case root~None       => new Tree(root,Nil)
+                case root~Some(subs) => new Tree(root,subs)
+            }
 
-		def start = tree
-	}
+        def start = tree
+    }
 }
 \end{verbatim}
 

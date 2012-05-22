@@ -1,3 +1,23 @@
+\subsection{General Marbles organisation}
+
+The current Marbles codebase is organised into three modules:
+\begin{itemize}
+\item \texttt{algorithm} holds the actual higher-level algorithms that have
+been implemented as part of this thesis. Future version will likely have
+baseline classes and traits available to help facilitate working with the
+as of yet unimplemented Marbles GUI, but as of now, the algorithms are
+relatively self-contained.
+\item \texttt{automaton} contains the various types of tree automata that
+have been implemented. These classes will likely also be further split up
+into base classes, traits and subclasses in the future, to avoid code
+duplication as far as possible. However, at the moment there are a few
+simple interface traits defined, with little code being shared between the
+classes.  
+\item \texttt{util} is a catch-all module for holding the basics of the
+Marbles system. Notably, alphabets and trees reside here, as does the
+basics of the parsing system.
+\end{itemize}
+
 \subsection{Tree automata}
 
 As various types of tree automata form the building blocks of Marbles, we
@@ -209,7 +229,7 @@ traits which may be implemented by the user. Alternatively, one may use one
 of the predefined semirings provided in \texttt{semirings.scala}, that is
 either
 \begin{compactitem}
-\item the \texttt{Reals} semiring (basically the real numbers, with $+$, $\cdot$, $0$ and $1$ as would be expected.
+\item the \texttt{Reals} semiring, which is basically the real numbers, with $+$, $\cdot$, $0$ and $1$ as would be expected.
 \item the \texttt{MaxPlus} semiring, with
 \subitem $0 = -\infty$
 \subitem $1 = 0$ 
@@ -237,7 +257,6 @@ $a[q_1 \ldots q_k] \rightarrow q'$ for $q',q_1 \ldots q_k \in Q, a \in
 \Sigma_k$
 \end{compactitem}
 %todo: Write stuff on weighted automata, using Fülöp and Vogler?
-
 
 \subsubsection{Generators}
 
@@ -306,6 +325,7 @@ fast as possible.
 %TODO: Illustrate?
 
 \subsection{Transducers}
+\label{ssec_transducerdef}
 
 Tree transducers are formalised automata that take a tree $t$ as input and
 use that to output a tree $t'$. Though not as extensively studied as the
@@ -320,7 +340,7 @@ tree recognisers that, apart from producing a state at each node, also
 procuce a tree. Additionally, there is a specified way the trees at each
 node are combined into one final output tree. More formally:
 
-A \emph{bottom-up finite tree transducer (BUFTT} is a 5-tuple $T = (\Sigma,
+A \emph{bottom-up finite tree transducer (BUFTT)} is a 5-tuple $T = (\Sigma,
 \Delta, Q, R, F)$, where
 \begin{compactitem}
 \item $\Sigma$ is the (ranked) input alphabet,
@@ -393,7 +413,10 @@ A top-down finite tree transducer (TDFTT) is a 5-tuple $T = (\Sigma,
 $$q[s[x_1,\ldots,x_k]] \rightarrow t'$$ where
 $q \in Q, s \in \Sigma_k, x_1,\ldots,x_k$ are variables, and
 $t' \in T_{\Delta \cup Q \cup {x_1,\ldots,x_k}}$, where $Q$ is seen as a
-ranked alphabet with $Q = Q_1$
+ranked alphabet with $Q = Q_1$, ${x_1,\ldots, x_k}$ is a likewise ranked
+alphabet $X$ with $X=X_0$, and elements $q \in Q$ and $x \in
+{x_1,\ldots,x_k}$ only ever occur as $q[x]$. That is, together, and at the
+end of a branch.
 \item and $q_0 \subset Q$ is a set of initial states.
 \end{compactitem}
 
@@ -420,10 +443,59 @@ copies of the same subtree using two different states, while in BUFTT any
 processing will already be complete by the time we are able to apply any
 copying. This important distiction means that there are relations that can
 be defined by BUFTT but not by TDFTT, and vice versa. This relationship
-will be further explored in Section \ref{ssec_tra nsducersplit}
+will be further explored in Section \ref{ssec_transducersplit}
+
 
 \subsubsection{Weighted transducers}
 
 
 
+\subsection{Other considerations}
+
+As will be shown in Section \ref{sec_results} the automata implementations
+given above are usable for implementing various algorithms working on tree
+automata. Still, many issues remain to be solved before the Marbles
+framework could be considered even close to completion, as would be
+expected. More problematic is the fact that several issues that were
+intended to have been approached in the prototype are still untouched.
+
+\subsubsection{Java integration}
+
+The original intention was to have a small proof-of-concept Java
+integration project ready to show how the prototype could be used by client
+programs written by researchers. This was not done, but considering the
+ease by which generic Scala code can be used in Java projects, it is likely
+that java integration will not pose much of a problem. The main concerns
+for Java integration lie in documenting how getter and setter methods work
+over the Java/Scala boundary. Alternatively, one could define suitable
+interface traits through which Java code would work. However, which method
+is the most suitable for this particular application is not known at this
+time, and further implementation work would have to be done to find out.
+
+\subsubsection{Graphical interface}
+
+In Treebag, most of the ''exploration'' of the effect of tree transducers
+and tree grammar rules is done in the graphical workbench UI. The project
+plan called for a similar interface to be available for the Marbles
+prototype, but for several reasons, this proved to be less than feasible.
+The first and most important reason is that time was short, and having a
+usable prototype at all had a higher priority than any graphical
+interfaces. However, during the course of the project, the thought of a
+Treebag-type graphical interface, ''stepping'' through the individual steps
+of the computations seemed less appealing as opposed to simply running the
+algorithm on the automata, and outputting the result in some human-readable
+form. Thus, effort was made to make the parsing and ''unparsing'' system
+more powerful, rather than to complicate things with some graphical
+interface toolkit.
+
+\subsubsection{Automata types}
+
+Obviously the above selection of automata types is rather basic. There are
+many other tree formalisms and devices that warrant inclusion in Marbles,
+such as Macro Tree Transducers, various kinds of attributed tree
+transducers, context-free tree grammars and push-down tree automata,
+various rewrite systems, such as L-systems etc. etc. The main reason for
+why the current selection of automata types is not larger is obviously time
+constraints, but the implemented types are also the formalisms that seem to
+have the most research centered around them.
 

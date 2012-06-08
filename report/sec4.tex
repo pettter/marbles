@@ -157,31 +157,61 @@ note that $Q$ is a singleton, and that we define exactly one rule in $R_2$
 for every possible left-hand side, meaning that the transduction defined by
 $T_2$ in in $\mathbf{PD_tT = HOM}$.
 
-As for the equality $L(B) = L(T_1 \circ T_2)$, we sketch a proof by
-induction on the input tree $t$:
+In lieu of a formal proof of $L(B) = L(T_1 \circ T_2$, we provide an
+example transduction using the two methdods to illustrate how each step of
+the transduction is preserved in the decomposition.
 
-\begin{itemize}
-\item First, note that due to the initial states of $T_1$ being $F$, it is
-suffient to prove that if there is a derivation by $B$ on a subtree $t$
-that can end up in $q[t']$, with $t' \in T_\Delta$, then $T_1 \circ T_2$,
-with $T_1$ starting in state $q$, will end up producing the same $t'$.
+Consider the example BUFTT $B = (\Sigma, \Delta, Q, R, F)$ where
+\begin{compactitem}
+\item $\Sigma = {a_2, b_1, c_0}$ 
+\item $\Delta = {f_2, g_1, h_1, i_0}$ 
+\item $Q = {q_a, q_even, q_odd}$ 
+\item $R = {$
+\begin{compactitem}
+\item $c \rightarrow q_even[i]$
+\item $b[q_even[x_1]] \rightarrow q_odd[g[x_1]]$
+\item $b[q_even[x_1]] \rightarrow q_odd[h[x_1]]$
+\item $b[q_odd[x_1]] \rightarrow q_even[g[x_1]]$
+\item $b[q_odd[x_1]] \rightarrow q_even[h[x_1]]$
+\item $a[q_even[x_1],q_odd[x_2]] \rightarrow q_a[f[x_2,x_2]]$
+\item $a[q_odd[x_1],q_even[x_2]] \rightarrow q_a[f[x_1,x_1]] }$
+\end{compactitem}
+\item $F = {q_a}$
+\end{compactitem}
 
-\item Consider the case where $t = s$, that is, the input is a single leaf.
-The result from $B$, started on $t$, is then the set $qts = {q[t']: s \rightarrow
- q[t'] \in R}$. For each such right-hand side we expect that $T_1 \circ T_2$,
-started in $q$, and run on $s$ will produce ${t' : q[t'] \in qts}$. By
-looking at the definitions of $\Omega$, $R_1$ and $R_2$, we see that $T_1$,
-ran on $q[s]$, will output the set of trees $dts = {d_t : q[s] \rightarrow d_t
-  \in R_1}$, further, $T_2$ will transform each of these trees to the
-''embedded'' set of trees ${t : d_t \in dts}$. By the definitions of $R_1$,
-$R_2$ and $\Omega$, this is exactly the set ${t' : q[t'] \in qts}$.
+That is, each input subtree of $b[b[\ldots b[c]]]$ that consists of an odd
+number of $b$s is copied (including the nondeterministic differences),
+while a subtree with an even number of $b$s is deleted. We place heavy
+constraints on what trees are accepted in order to make the rule set
+smaller and simpler. Notably, we only accept input trees on the form
+$a[b[b[\ldots b[c]]],b[b[\ldots b[c]]]]$.
 
-\item Moving on to the case of $t = s[t_1,\ldots,t_k]$, we know that $B$,
-started on $t$ will produce a set $qts = {q[t']: s[x_1,+ldots,x_k]
-  \rightarrow q[t'] \in R}$. For
-each such right-hand side
 
-\end{itemize}
+%As for the equality $L(B) = L(T_1 \circ T_2)$, we sketch a proof by
+%induction on the input tree $t$:
+%
+%\begin{itemize}
+%\item First, note that due to the initial states of $T_1$ being $F$, it is
+%suffient to prove that if there is a derivation by $B$ on a subtree $t$
+%that can end up in $q[t']$, with $t' \in T_\Delta$, then $T_1 \circ T_2$,
+%with $T_1$ starting in state $q$, will end up producing the same $t'$.
+%
+%\item Consider the case where $t = s$, that is, the input is a single leaf.
+%The result from $B$, started on $t$, is then the set $qts = {q[t']: s \rightarrow
+% q[t'] \in R}$. For each such right-hand side we expect that $T_1 \circ T_2$,
+%started in $q$, and run on $s$ will produce ${t' : q[t'] \in qts}$. By
+%looking at the definitions of $\Omega$, $R_1$ and $R_2$, we see that $T_1$,
+%ran on $q[s]$, will output the set of trees $dts = {d_t : q[s] \rightarrow d_t
+%  \in R_1}$, further, $T_2$ will transform each of these trees to the
+%''embedded'' set of trees ${t : d_t \in dts}$. By the definitions of $R_1$,
+%$R_2$ and $\Omega$, this is exactly the set ${t' : q[t'] \in qts}$.
+%
+%\item Moving on to the case of $t = s[t_1,\ldots,t_k]$, we know that $B$,
+%started on $t$ will produce a set $qts = {q[t']: s[x_1,+ldots,x_k]
+%  \rightarrow q[t'] \in R}$. For
+%each such right-hand side
+%
+%\end{itemize}
 
 
 

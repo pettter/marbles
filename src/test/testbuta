@@ -1,0 +1,9 @@
+{a|0,b|0,c|2}
+{qa,qb}
+c[qa,qa]|{qa}
+c[qb,qa]|{qa,qb}
+c[qa,qb]|{qa,qb}
+c[qb,qb]|{qb}
+a|{qa}
+b|{qb}
+{qa}

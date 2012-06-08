@@ -1,0 +1,13 @@
+RTG{
+Starting symbol,
+{a|0,b|0,f|2,g|1},
+{
+        q_ab|f[|q_a,|q_b],
+	q_a|a,
+	q_a|f[|q_a,|q_a],
+	q_a|g[|q_ab],
+	q_b|b,
+	q_b|f[|q_b,|q_b],
+        Starting symbol||q_ab,
+}
+}

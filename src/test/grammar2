@@ -1,0 +1,24 @@
+RTG{
+Starting symbol,
+{a|2,b|2,e|0},
+{
+        q_ab|a[|q_e,|q_b],
+        q_ab|a[|q_b,|q_e],
+        q_ab|a[|q_a,|q_b],
+        q_ab|a[|q_b,|q_a],
+        q_ab|a[|q_e,|q_ab],
+        q_ab|a[|q_ab,|q_e],
+        q_ab|a[|q_a,|q_ab],
+        q_ab|a[|q_ab,|q_a],
+        q_b|b[|q_e,|q_e],
+        q_b|b[|q_b,|q_e],
+        q_b|b[|q_e,|q_b],
+        q_b|b[|q_b,|q_b],
+        q_a|a[|q_e,|q_e],
+        q_a|a[|q_a,|q_e],
+        q_a|a[|q_e,|q_a],
+        q_a|a[|q_a,|q_a],
+        q_e|e,
+        Starting symbol||q_ab,
+}
+}

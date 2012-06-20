@@ -17,6 +17,21 @@ object Util {
 				x.flatMap(e => l.map(f => e +: f))
 		}
 	}
+
+	def getUniqueState(states:Set[String],
+	                   suggestion:String="",
+			   iter:Int=0
+			  ):String = {
+	   val s = if(iter == 0)
+	       suggestion
+             else
+	       suggestion + iter
+	   if(!states.contains(s))
+	       s
+	   else
+	       getUniqueState(states,suggestion,iter+1)
+	}
+
 //	def singleton[T](implicit man: reflect.Manifest[T]) = {
 //		val name = man.erasure.getName() 
 //		assert(name endsWith "$", "Not an object: " + name)

@@ -186,6 +186,86 @@ constraints on what trees are accepted in order to make the rule set
 smaller and simpler. Notably, we only accept input trees on the form
 $a[b[b[\ldots b[c]]],b[b[\ldots b[c]]]]$.
 
+As our standing example input in dealing with this transduction, we use the
+simple, valid input tree $a[b[b[c]],b[c]]$, which gives the output tree set
+${f[g[i],g[i]], f[h[i],h[i]]}$ as output, according to the rules governing
+BUFTT.
+
+Using the BUTSplitter algorithm to split $B$, we start by finding the
+relevant intermediate alphabet 
+$$\Omega={d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_1, d_{f[x_1,x_1]}_1}$$,
+
+With this done, we move on to the first TDFTT $T_1$ (the finite state
+relabeling), where
+
+\begin{compactitem}
+\item $\Sigma = {a_2, b_1, c_0}$,
+\item $\Delta = \Omega = {d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_2, d_{f[x_1,x_1]}_2}$,
+\item $Q = {q_a, q_{even}, q_{odd}}$ 
+\item $R = {$
+\begin{compactitem}
+\item $q_{even}[c] \rightarrow d_{i}$
+\item $q_{even}[b[x_1]] \rightarrow d_{g[x_1]}[q_{odd}[x_1]]$
+\item $q_{even}[b[x_1]] \rightarrow d_{h[x_1]}[q_{odd}[x_1]]$
+\item $q_{odd}[b[x_1]] \rightarrow d_{g[x_1]}[q_{even}[x_1]]$
+\item $q_{odd}[b[x_1]] \rightarrow d_{h[x_1]}[q_{even}[x_1]]$
+\item $q_a[a[x_1,x_2]] \rightarrow d_{f[x_1,x_1]}[q_{odd}[x_1],q_{even}[x_2]]$
+\item $q_a[a[x_1,x_2]] \rightarrow d_{f[x_2,x_2]}[q_{even}[x_1],q_{odd}[x_2]] }$
+\end{compactitem}
+\item $q_0 = {q_a}$
+\end{compactitem}
+
+Note that even though only one of the two subtrees of the $d_{f[\ldots]}$
+is used in the final output, we still need to do computations on both
+subtrees to determine that their heights are correct (even and odd,
+respectively). Any rejection of an input tree happens in this transducer,
+through failing to apply rules to a subtree.
+
+The homomorphism $T_2$ that completes the tree transduction is comparatively
+simple; in TDFTT form:
+
+\begin{compactitem}
+\item $\Sigma = \Omega = {d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_2, d_{f[x_1,x_1]}_2}$,
+\item $\Delta = {f_2, g_1, h_1, i_0}$ 
+\item $Q = {q_{only}}$
+\item $R = {$
+\begin{compactitem}
+\item $q_{only}[d_{i}] \rightarrow i$
+\item $q_{only}[d_{g[x_1]}[x_1]] \rightarrow g[q_{only}[x_1]]$
+\item $q_{only}[d_{h[x_1]}[x_1]] \rightarrow h[q_{only}[x_1]]$
+\item $q_{only}[d_{f[x_1,x_1}[x_1,x_2]] \rightarrow f[q_{only}[x_1],q_{only}[x_1]]$
+\item $q_{only}[d_{f[x_2,x_2}[x_1,x_2]] \rightarrow f[q_{only}[x_2],q_{only}[x_2]] }$
+\end{compactitem}
+\item $q_0 = q_{only}$
+\end{compactitem}
+
+There is nothing inherently interesting about this transduction, save that
+it applies the copying and deletion that is specified by the relabeling
+(the $d_{f[\ldots]}$ rules, again). 
+
+By applying only the relabeling $T_1$ to the input tree $a[b[b[c]],b[c]]$,
+we arrive at the intermediate tree set
+$$
+{ &d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]] }
+$$
+
+Obviously, all derivations starting with the rule
+$$q_a[a[x_1,x_2]] \rightarrow d_{f[x_1,x_1]}[q_{odd}[x_1],q_{even}[x_2]]$$
+will fail, as it is not possible to construct a successful run from
+$q_{odd}$ on the subtree $b[b[c]]$, and neither from $q_{even}$ on $b[c]$.
+Nevertheless, the amount of trees would look strange, given that the
+correct output according to $B$ is a set of only two trees. However, the
+homomorphism will delete the larger subtrees (which are all that differs
+within two groups of four trees each), leaving a set of two trees.
+
+
 
 %As for the equality $L(B) = L(T_1 \circ T_2)$, we sketch a proof by
 %induction on the input tree $t$:

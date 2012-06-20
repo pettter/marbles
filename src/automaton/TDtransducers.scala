@@ -104,7 +104,7 @@ class TDTreeTransducer[F,T](
    	   val delta:RankedAlphabet[T],
 	   val states:Set[String], //Should possibly be parameterised as well
 	   val rules:Map[(F,String),Set[(VarTree[T],Seq[(String,Int)])]],
-	   val q0:Set[String]) extends AnyRef with TreeTransducer[F,T] {
+	   val q0:Set[String]) extends TreeTransducer[F,T] {
 	
 	override def toString:String = {
 		var ret:StringBuilder = new StringBuilder( 
@@ -117,11 +117,26 @@ class TDTreeTransducer[F,T](
 		ret.toString
 	}
 
+	/*private def totalLHSSet:scala.collection.Set[(F,String)] = {
+	  sigma.map.keySet flatMap ( x => states map (y => (x,y))) 
+	}
+
+
+	def total:TDTreeTransducer[F,T] = {
+	  new TDTreeTransducer(
+	    sigma,
+	    delta,
+	    states,
+	    totalLHSSet map (x => (x, rules.getOrElse(x, Set()) +
+		((VarTree(Right(delta.leaves.head),List()), List())))) toMap,
+	    q0)
+
+	} */
 	/** Get the trees resulting from processing the input tree starting in
 	 *  state q
 	 */
 	def applyState(q : String,tree : Tree[F]):Set[Tree[T]] ={
-		val rhs = rules(tree.root,q)
+		val rhs = rules.getOrElse((tree.root,q),Set())
 		for(
 			 (t,pairs) <- rhs; // Pairs of index/state to process and
 			 				   // insert into the output tree t

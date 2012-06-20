@@ -45,7 +45,7 @@ object BUTreeTransducer {
 					}
 			// The right-hand side of a rule is a state and a variable
 			// tree, separated by a |
-			def rhs = state~"|"~vp ^^ {case st~"|"~tr => (tr,st)}
+			def rhs = "{"~state~"|"~vp~"}" ^^ {case "{"~st~"|"~tr~"}" => (tr,st)}
 			// A rule is a left-hand side and a right-hand side
 			def rule = lhs~"|"~rhs ^^ {case lh~"|"~rh => (lh,rh)}
 			// We need to group all the right-hand sides sharing the same
@@ -95,10 +95,32 @@ class BUTreeTransducer[F,T](
 	 */
 	def applyState(t : Tree[F]):Set[(Tree[T],String)] = {
 		val pairs = Util.cartSet(t.subtrees map applyState)
-		(for((trees,states) <- pairs map (_.unzip) if rules.isDefinedAt(t.root,states) ;
+		(for((trees,states) <- pairs map (_.unzip) if rules.isDefinedAt((t.root,states)) ;
 			(vtree,state) <- rules(t.root,states)) yield 
 				(vtree subAll trees,state)) toSet
 	}
+	
+	private def totalLHSSet(dead:String):scala.collection.Set[(F,Seq[String])] = {
+	  val newstates = states + dead
+	  sigma.map.keySet flatMap ( x => Util.cartSet(Seq.fill(sigma(x))(newstates)) map (y => (x,y))) 
+	}
+
+
+	def total:BUTreeTransducer[F,T] = {
+	  val dead = Util.getUniqueState(states,"dead_state")
+	  new BUTreeTransducer(
+	    sigma,
+	    delta,
+	    states + dead,
+	    totalLHSSet(dead) map (x => (x, rules.getOrElse(x,Set()) +
+		((VarTree(Right(delta.leaves.head),List()), dead)))) toMap,
+	    fin)
+
+	}
+
+	    
+
+
 
 	/** Get the output trees determined by the input tree
 	 */

@@ -1,0 +1,6 @@
+*.class
+*.aux
+*.dvi
+*.log
+*.pdf
+*.sw?

@@ -13,7 +13,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 			(_,stsixs) <- rhss) yield
 		(stsixs groupBy(_._2)) map (_._2.size)) flatten) max
 
-	val nSigma = tdt.sigma multiRanked(maxCopy)
+	val omega = tdt.sigma multiRanked(maxCopy)
 
 
 	// A simple homomorphism to preemptively 'explode' the trees into
@@ -22,11 +22,11 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 	// level of each symbol
 	val hom = new BUTreeTransducer[F,F](
 		tdt.sigma, // Same input alphabet, obviously
-		nSigma, // Output is in the 'exploded' alphabet
+		omega, // Output is in the 'exploded' alphabet
 		Set("q"), // A single state is sufficient for homomorphisms
 		// Rules copy each subtree maxCopy times, 'exploding' the tree
 		(for(sym:F <- tdt.sigma.map.keys) yield (
-			(sym,Seq.fill(nSigma(sym))("q")),
+			(sym,Seq.fill(omega(sym))("q")),
 			Set((new VarTree(Right(sym),(
 				(for(i <- 0 until tdt.sigma(sym);
 					j <- 0 until maxCopy) yield
@@ -77,7 +77,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		 // Several things make this difficult.
 		 // * The index/state pairs of the original rules refer to the
 		 //   subtrees of the original trees, which are in tdt.sigma, not
-		 //   in nSigma
+		 //   in omega
 		 // * We need to create a sequence of tuples instead of a map, and
 		 //   then use groupBy, map and flatten to get the proper rule map,
 		 //   since certain symbol/statesequence combinations may crop up
@@ -87,7 +87,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		 //   the mangleIndices function)
 			val (varmap,statemap) = mangleIndices(stsixs)
 			val t = tree.subst(varmap)
-			val states = for(ix <- 0 until nSigma(sym)) yield
+			val states = for(ix <- 0 until omega(sym)) yield
 							statemap.getOrElse(ix,"")
 			((sym,states),(t,state))})
 
@@ -97,14 +97,14 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 	// each subtree as is necessary to achieve the same result as the
 	// original TDT
 	val lb = new BUTreeTransducer[F,T](
-		nSigma, // exploded input alphabet
+		omega, // exploded input alphabet
 		tdt.delta, // original output alphabet
 		tdt.states + "", // Original states, except that we need a
 						 // 'dead' state to make sure that all subtrees
 						 // are live in some sense. I.e. execution will not
 						 // stop just because an irrelevant subtree is dead
 		// As always, the rule translation is the most hairy part
-		((for((sym,rank) <- nSigma.map) yield // First, the 'dead' state
+		((for((sym,rank) <- omega.map) yield // First, the 'dead' state
 		 ((sym,Seq.fill(rank)("")),
 		  // We need to supply a tree, but what tree does not really
 		  // matter. In the lecture notes, sigma is part of the new delta,
@@ -127,7 +127,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		 // Several things make this difficult.
 		 // * The index/state pairs of the original rules refer to the
 		 //   subtrees of the original trees, which are in tdt.sigma, not
-		 //   in nSigma
+		 //   in omega
 		 // * We need to create a sequence of tuples instead of a map, and
 		 //   then use groupBy, map and flatten to get the proper rule map,
 		 //   since certain symbol/statesequence combinations may crop up
@@ -137,7 +137,7 @@ class TDTSplitter[F,T](val tdt:TDTreeTransducer[F,T]) {
 		 //   the mangleIndices function)
 			val (varmap,statemap) = mangleIndices(stsixs)
 			val t = tree.subst(varmap)
-			val states = for(ix <- 0 until nSigma(sym)) yield
+			val states = for(ix <- 0 until omega(sym)) yield
 							statemap.getOrElse(ix,"")
 			((sym,states),(t,state))
 		})) groupBy (_._1) map ({ case (lhs,rhss) =>

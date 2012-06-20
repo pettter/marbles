@@ -14,14 +14,14 @@ object BUTSplitter {
 			     (TDTreeTransducer[F,VarTree[T]],
 			      TDTreeTransducer[VarTree[T],T]) = {
 	
-	    val treeAlpha = (new RankedAlphabet(
+	    val omega = (new RankedAlphabet(
 				    (for(rhs <- but.rules.values; 
 					    v <- rhs) 
 				    yield (v._1, v._1.rank)) toMap)
 			    )
 	    (new TDTreeTransducer( // A (finite state) relabeling
 			    but.sigma, // Same input alphabet obviously
-			    treeAlpha, // Right hand sides as 'state markers'
+			    omega, // Right hand sides as 'state markers'
 			    but.states, // Same states in the relabeling`
 			    // For-loop below creates a sequence of pairs which fit
 			    // into a TD transducer, however the right hand sides still
@@ -37,10 +37,10 @@ object BUTSplitter {
 			    but.fin	// Final states is equivalent to initial states	
 		    ),
 	    new TDTreeTransducer( // The finishing homomorphism
-			    treeAlpha, // Output from relabeling is input for this
+			    omega, // Output from relabeling is input for this
 			    but.delta, // While output is output from the original
 			    Set("q"),  // Only a single state needed for a homomorphism
-			    (for((tree,rank) <- treeAlpha.map) yield
+			    (for((tree,rank) <- omega.map) yield
 			     ((tree,"q"),
 			      Set((tree,Seq.fill(rank)("q") zipWithIndex)))) toMap,
 			    Set("q")   // The single state is also initial
@@ -56,7 +56,7 @@ object BUTSplitter {
 class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 
 	// The alphabet of right-hand sides of the bu transducer
-	private val treeAlpha = (new RankedAlphabet(
+	private val omega = (new RankedAlphabet(
 					(for(rhs <- but.rules.values; 
 						v <- rhs) 
 					yield (v._1, v._1.rank)) toMap)
@@ -65,7 +65,7 @@ class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 	val rel:TDTreeTransducer[F,VarTree[T]] = //Relabeling
 		new TDTreeTransducer(
 				but.sigma, // Same input alphabet obviously
-				treeAlpha, // Right hand sides as 'state markers'
+				omega, // Right hand sides as 'state markers'
 				but.states, // Same states in the relabeling`
 				// For-loop below creates a sequence of pairs which fit
 				// into a TD transducer, however the right hand sides still
@@ -82,10 +82,10 @@ class BUTSplitter[F,T](val but:BUTreeTransducer[F,T]) {
 			)
 	val hom:TDTreeTransducer[VarTree[T],T] = //Homomorphism
 		new TDTreeTransducer(
-				treeAlpha, // Output from relabeling is input for this
+				omega, // Output from relabeling is input for this
 				but.delta, // While output is output from the original
 				Set("q"),  // Only a single state needed for a homomorphism
-				(for((tree,rank) <- treeAlpha.map) yield
+				(for((tree,rank) <- omega.map) yield
 				 ((tree,"q"),
 				  Set((tree,Seq.fill(rank)("q") zipWithIndex)))) toMap,
 				Set("q")   // The single state is also initial

@@ -78,6 +78,25 @@ such that each direct subtree can be given an index. However, it is likely
 that the complete Marbles system would contain support for unordered trees
 as well. 
 
+\subsubsection{Contexts, variables and multicontexts}
+
+A \emph{context} $c$ over the ranked alphabet $\Sigma$ is a tree with a
+special symbol $\box \notin \Sigma$ occuring exactly once, as a leaf. The
+substitution of any tree $t \in T_\Sigma$ in place of the symbol $\box$ is
+denoted $c[t]$ and (obviously) yields a tree in $T_\Sigma$. The set of all
+context over the ranked alphabet $\Sigma$ is denoted $C_\Sigma$.
+
+We define a set $X$ of \emph{variables} $x_1,x_2,\ldots$, which is disjoint
+from any specific ranked alphabet considered in this thesis. In terms of
+ranks, $X=X_0$, and we use the notation $X^k$ to denote the $k$ first
+elements of $X$.
+
+A \emph{multicontext} $c^k$ of rank $k$ over the ranked alphabet $\Sigma$
+is a tree in $T_{\Sigma \cup X^k}$, where each variable occurs only once.
+We use the notation $c[t_1,\ldots,t_k]$ to denote the substitution of each
+variable $x_i$ by the tree $t_i$. Note that any any variables occuring in
+any tree $t_i$ is taken to be distinct from the variables in $c$.
+
 \subsubsection{String automata}
 \label{ssec_fsa}
 

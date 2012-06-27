@@ -1,18 +1,205 @@
-\section{Conclusions and future work}
+\subsection{Bottom-up transducer splitting}
 
+Recall that a BUFTT is a 5-tuple $B = (\Sigma, \Delta, Q, R, F)$, and
+a TDFTT is a 5-tuple $T = (\Sigma, \Delta, Q, R, q_0)$,
+as defined in Subsection \ref{ssec_transducerdef}. Further, according to
+the above reasoning, the features of BUFTT that can not be realised using a
+single TDFTT is that of deleting subtrees based on the features of that
+subtree, and that of copying an already processed output tree into multiple
+copies.
 
-Future work: make trees and automata not parameterised in the type of the
-alphabet, but rather in the actual \emph{alphabet}. Need to check if this
-is reasonable/possible, specifically if type checking is based on object
-identity or equality. Probably impossible due to type erasure...
+The idea of the BUFTT decomposition algorithm is to define a
+''transitional'' alphabet, which is used by the finite state relabeling to
+store information indicating by which tree-piece the node should be replace
+to produce the final output tree. After that, a homomorphism is used to
+actually apply the replacements. Formally,
 
-Future work: Other automata types (should mention in report?) MTT,
-       attributed TT, CFTG, rewrite systems (L-systems?)
+\begin{itemize}
+\item Let $B = (\Sigma, \Delta, Q, R, F)$ be the (input) BUFTT, then
 
-Future work: is deterministic a subtype? a property? both? not a trait at
-least
+\item $\Omega$ is the transitional alphabet, defined as follows: if 
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t]$$ is a rule in $R$, then
+$d_{t}$ is a (new) symbol in $\Omega_k$.
 
-Future work: Parameterise classes on state type, makes composition much
-simpler.
+\item We define the TDFTT $T_1 = (\Sigma, \Omega, Q, R_1, F)$, a
+finite state relabeling, with $R_1$ defined as follows: if 
+$$s[q_1[x_1],\ldots,q_k[x_k]] \rightarrow q[t]$$ is a rule in $R$, then
+$$q[s[x_1,\ldots,x_k]] \rightarrow d_{t}[q_1[x_1],\ldots,q_k[x_k]] \in R_1$$
 
+\item We define the TDFTT $T_2 = (\Omega, \Delta, {q_{only}}, R_2, {q_{}only})$, a tree
+homomorphism, with $R_2$ defined as follows: $$\forall d_t \in \Omega:
+q_{only}[d_t[x_1,\ldots,x_k]] \rightarrow t' \in R_2$$ where $t'$ is the tree obtained by
+replacing each element of $Q$ in $t$ by $q_{only}$.
+\end{itemize}
+
+Note that $\Omega$ is finite, as $R$ has a finite number of right-hand
+sides. Further, looking at the rules in $R_1$, they all conform to the
+pattern specified for TDFTT implementing finite state relabelings, meaning
+that the transduction defined by $T_1$ is in $\mathbf{QREL}$. For $T_2$,
+note that $Q$ is a singleton, and that we define exactly one rule in $R_2$
+for every possible left-hand side, meaning that the transduction defined by
+$T_2$ in in $\mathbf{PD_tT = HOM}$.
+
+In lieu of a formal proof of $L(B) = L(T_1 \circ T_2$, we provide an
+example transduction using the two methdods to illustrate how each step of
+the transduction is preserved in the decomposition.
+
+Consider the example BUFTT $B = (\Sigma, \Delta, Q, R, F)$ where
+\begin{compactitem}
+\item $\Sigma = {a_2, b_1, c_0}$ 
+\item $\Delta = {f_2, g_1, h_1, i_0}$ 
+\item $Q = {q_a, q_even, q_odd}$ 
+\item $R = {$
+\begin{compactitem}
+\item $c \rightarrow q_even[i]$
+\item $b[q_even[x_1]] \rightarrow q_odd[g[x_1]]$
+\item $b[q_even[x_1]] \rightarrow q_odd[h[x_1]]$
+\item $b[q_odd[x_1]] \rightarrow q_even[g[x_1]]$
+\item $b[q_odd[x_1]] \rightarrow q_even[h[x_1]]$
+\item $a[q_even[x_1],q_odd[x_2]] \rightarrow q_a[f[x_2,x_2]]$
+\item $a[q_odd[x_1],q_even[x_2]] \rightarrow q_a[f[x_1,x_1]] }$
+\end{compactitem}
+\item $F = {q_a}$
+\end{compactitem}
+
+That is, each input subtree of $b[b[\ldots b[c]]]$ that consists of an odd
+number of $b$s is copied (including the nondeterministic differences),
+while a subtree with an even number of $b$s is deleted. We place heavy
+constraints on what trees are accepted in order to make the rule set
+smaller and simpler. Notably, we only accept input trees on the form
+$a[b[b[\ldots b[c]]],b[b[\ldots b[c]]]]$.
+
+As our standing example input in dealing with this transduction, we use the
+simple, valid input tree $a[b[b[c]],b[c]]$, which gives the output tree set
+${f[g[i],g[i]], f[h[i],h[i]]}$ as output, according to the rules governing
+BUFTT.
+
+Using the BUTSplitter algorithm to split $B$, we start by finding the
+relevant intermediate alphabet 
+$$\Omega={d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_1, d_{f[x_1,x_1]}_1}$$,
+
+With this done, we move on to the first TDFTT $T_1$ (the finite state
+relabeling), where
+
+\begin{compactitem}
+\item $\Sigma = {a_2, b_1, c_0}$,
+\item $\Delta = \Omega = {d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_2, d_{f[x_1,x_1]}_2}$,
+\item $Q = {q_a, q_{even}, q_{odd}}$ 
+\item $R = {$
+\begin{compactitem}
+\item $q_{even}[c] \rightarrow d_{i}$
+\item $q_{even}[b[x_1]] \rightarrow d_{g[x_1]}[q_{odd}[x_1]]$
+\item $q_{even}[b[x_1]] \rightarrow d_{h[x_1]}[q_{odd}[x_1]]$
+\item $q_{odd}[b[x_1]] \rightarrow d_{g[x_1]}[q_{even}[x_1]]$
+\item $q_{odd}[b[x_1]] \rightarrow d_{h[x_1]}[q_{even}[x_1]]$
+\item $q_a[a[x_1,x_2]] \rightarrow d_{f[x_1,x_1]}[q_{odd}[x_1],q_{even}[x_2]]$
+\item $q_a[a[x_1,x_2]] \rightarrow d_{f[x_2,x_2]}[q_{even}[x_1],q_{odd}[x_2]] }$
+\end{compactitem}
+\item $q_0 = {q_a}$
+\end{compactitem}
+
+Note that even though only one of the two subtrees of the $d_{f[\ldots]}$
+is used in the final output, we still need to do computations on both
+subtrees to determine that their heights are correct (even and odd,
+respectively). Any rejection of an input tree happens in this transducer,
+through failing to apply rules to a subtree.
+
+The homomorphism $T_2$ that completes the tree transduction is comparatively
+simple; in TDFTT form:
+
+\begin{compactitem}
+\item $\Sigma = \Omega = {d_{i}_0, d_{g[x_1]}_1, d_{h[x_1]}_1, d_{f[x_2,x_2]}_2, d_{f[x_1,x_1]}_2}$,
+\item $\Delta = {f_2, g_1, h_1, i_0}$ 
+\item $Q = {q_{only}}$
+\item $R = {$
+\begin{compactitem}
+\item $q_{only}[d_{i}] \rightarrow i$
+\item $q_{only}[d_{g[x_1]}[x_1]] \rightarrow g[q_{only}[x_1]]$
+\item $q_{only}[d_{h[x_1]}[x_1]] \rightarrow h[q_{only}[x_1]]$
+\item $q_{only}[d_{f[x_1,x_1}[x_1,x_2]] \rightarrow f[q_{only}[x_1],q_{only}[x_1]]$
+\item $q_{only}[d_{f[x_2,x_2}[x_1,x_2]] \rightarrow f[q_{only}[x_2],q_{only}[x_2]] }$
+\end{compactitem}
+\item $q_0 = q_{only}$
+\end{compactitem}
+
+The rule set of this homomorphism should be sufficient to demonstrate how
+deletion and copying is translated in the BUTSplitter algorithm.
+Specifically, the $d_{f[\ldots]}$ rules are again the rules that are of
+interest.
+
+By applying only the relabeling $T_1$ to the input tree $a[b[b[c]],b[c]]$,
+we arrive at the intermediate tree set
+$$
+{ 
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{h[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]],\\
+\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]]
+}
+$$
+
+Obviously, all derivations starting with the rule
+$$q_a[a[x_1,x_2]] \rightarrow d_{f[x_1,x_1]}[q_{odd}[x_1],q_{even}[x_2]]$$
+will fail, as it is not possible to construct a successful run from
+$q_{odd}$ on the subtree $b[b[c]]$, and neither from $q_{even}$ on $b[c]$.
+Nevertheless, the amount of trees would look strange, given that the
+correct output according to $B$ is a set of only two trees. However, the
+homomorphism will delete the larger subtrees (which are all that differs
+within two groups of four trees each), leaving the correct set of two
+trees:
+
+$${f[g[i],g[i]], f[h[i],h[i]]}a$$
+
+\subsection{Top-down transducer splitting}
+
+In the case of TDFTT, the capabilities that a single BUFTT is unable to
+reproduce is, as stated, to copy an input subtree and use different
+processing for different copies, either through starting in different
+states or through nondeterminism having different outcomes.
+
+We again define a transitional alphabet $\Omega$ to realise the goal.
+However, instead of storing information about the nondeterminism, copying
+and deletion applied in the labels, the first BUFTT is a homomorphism,
+''exploding'' the input tree into a much ''wider'' version of the input
+tree. Specifically, each subtree $b[t]$ is converted into a new subtree
+$b[t,t,\ldots,t]$, where the number of $t$'s in the output is dependent on
+the maximum number of copies that might be made of a subtree in the input
+TDFTT. After copying is done, a linear BUFTT does the computations required
+on all copies simultaneously, after which the unneeded subtrees are simply
+deleted. Formally:
+
+\begin{itemize}
+\item Let $T = (\Sigma, \Delta, Q, R, q_0)$ be the input TDFTT, then
+
+\item $\Omega$ is the transitional alphabet, defined as follows: if $n$ is
+the maximum number of copies made by any rule in $R$ of any subtree, and 
+$s_k \in \Sigma$, then $s_{k*n} \in \Omega$.
+
+\item We define a homomorphism, $B_1 = (\Sigma, \Omega, q_{only}, R_1, q_{only})$
+where $R_1$ is defined as follows: $\forall s_k \in \Sigma:
+s[q_{only}[x_1],\ldots,q_{only}[x_k]] \rightarrow
+\q_{only}[s[x_1,x_1,\ldots,x_k,x_k]] \in R_1$, where each $x_i$ occurs
+exactly $n$ times in the right-hand side of the rule.
+
+\item We define a linear BUFTT, $B_2' = (\Omega, \Delta, Q, R_2, q_0)$,
+	where $R_2$ is discussed further below.
+\end{itemize}
+
+$R_2$ is slightly more complex than $R_1$ in the bottom-up case. Suppose
+that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,[q_n[x_i_n]]]$$
+is a rule in $R$, then a set of rules exists in $R_2$, where 
+%TODO: R_2
+
+However, the BUFTT $B_2'$ is not quite sufficient to define the translation
+we seek, as irrelevant subtrees, which are never even considered by $T$
+will be interpreted by $B_2'$ as faulty (i.e. there are no rules to apply
+at a certain place), halting the transduction. A simple solution for this
+problem is to make $B_2'$ \emph{total}, adding a \emph{dead state} to $Q$,
+and adding rules to $R_2$ such that all possible previously undefined
+transitions go to the new dead state.
 

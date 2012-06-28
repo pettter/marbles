@@ -186,13 +186,25 @@ s[q_{only}[x_1],\ldots,q_{only}[x_k]] \rightarrow
 \q_{only}[s[x_1,x_1,\ldots,x_k,x_k]] \in R_1$, where each $x_i$ occurs
 exactly $n$ times in the right-hand side of the rule.
 
-\item We define a linear BUFTT, $B_2' = (\Omega, \Delta, Q, R_2, q_0)$,
+\item We define a linear BUFTT, $B_2 = (\Omega, \Delta, Q, R_2, q_0)$,
 	where $R_2$ is discussed further below.
 \end{itemize}
 
-$R_2$ is slightly more complex than $R_1$ in the bottom-up case. Suppose
-that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,[q_n[x_i_n]]]$$
-is a rule in $R$, then a set of rules exists in $R_2$, where 
+$R_2$ is significantly more complex than $R_1$ in the bottom-up case, and we
+start by discussing a closely related rule set, $R_2'$. Suppose
+that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+is a rule $r \in R$. The first step in the transformation is to move to a
+linear rule from $\Omega$ to $\Delta$ instead of from $\Sigma$.  In order
+to make the transformations obvious, we choose to number the variables used
+in $\Omega$ rules $x_1^1,x_1^2,\ldots,x_1^n,x_2^1,\ldots,x_k^n$ instead of
+the normal numbering. The linear rule thus becomes
+$$q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+where each $x_i$ in the right-hand side that were previously $x_1$ now
+points to a different $x_1^j$, and likewise for $x_2$ and so on.
+
+
+
+
 %TODO: R_2
 
 However, the BUFTT $B_2'$ is not quite sufficient to define the translation

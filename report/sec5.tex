@@ -40,6 +40,8 @@ note that $Q$ is a singleton, and that we define exactly one rule in $R_2$
 for every possible left-hand side, meaning that the transduction defined by
 $T_2$ in in $\mathbf{PD_tT = HOM}$.
 
+\subsubsection{BUFTT splitting example}
+
 In lieu of a formal proof of $L(B) = L(T_1 \circ T_2$, we provide an
 example transduction using the two methdods to illustrate how each step of
 the transduction is preserved in the decomposition.
@@ -190,8 +192,7 @@ exactly $n$ times in the right-hand side of the rule.
 	where $R_2$ is discussed further below.
 \end{itemize}
 
-$R_2$ is significantly more complex than $R_1$ in the bottom-up case, and we
-start by discussing a closely related rule set, $R_2'$. Suppose
+$R_2$ is significantly more complex than $R_1$ in the bottom-up case. Suppose
 that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
 is a rule $r \in R$. The first step in the transformation is to move to a
 linear rule from $\Omega$ to $\Delta$ instead of from $\Sigma$.  In order
@@ -202,16 +203,67 @@ $$q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
 where each $x_i$ in the right-hand side that were previously $x_1$ now
 points to a different $x_1^j$, and likewise for $x_2$ and so on.
 
+Now, in order to ''flip'' these rules around to make a BUFTT, we need to
+not only change the positions of the states and variables, but do so in a
+way that preserves both the ordering of the input subtrees and the
+state-subtree relations that are in the output of the above rules. Though
+it is not hard to grasp intuitively that this is possible, defining the
+precise relationships takes more effort.
 
+Basically, each rule
+$$r_1 = q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+becomes
+$$r_2 = s[q_j_1[x_1^1],q_j_2[x_1^2],\ldots,q_j_{k*n}[x_k^n]] \rightarrow q[c[x_i_1,\ldots,x_i_l]]$$
+where each $q_j_1$ in the left hand side matches the requisite state in the
+previous right hand side. This obviously does not cover all cases, as $l$
+may be less than $k*n$, but we can introduce a new state $q_{nop}$, not in
+$F$, to handle the irrelevant subtrees. That is, for each $q_k[x_i^j]$
+occuring in the right-hand side of $r_1$, $q_k[x_i^j]$ is in the left-hand
+side of $r_2$, and for each $x_i^j$ \emph{not} occurring in the right-hand
+side of $r_1$, $q_{nop}[x_i^j$ occurs in the left-hand side of $r_2$. 
 
+We also define a new set of transitions, to make the $q_{nop}$ state work
+properly: For each symbol $s_k \in \Omega$, we define a rule
+$$r = s[q_{nop}[x_1],\ldots,q_{nop}[x_k]] \rightarrow q_{nop}[a]$$
+where $a \in \Delta_0$. Note that the choice of $a$ is irrelevant, as no
+tree below a $q_{nop}$ state will ever appear in the output.
 
-%TODO: R_2
+\subsubsection{TDFTT splitting example}
 
-However, the BUFTT $B_2'$ is not quite sufficient to define the translation
-we seek, as irrelevant subtrees, which are never even considered by $T$
-will be interpreted by $B_2'$ as faulty (i.e. there are no rules to apply
-at a certain place), halting the transduction. A simple solution for this
-problem is to make $B_2'$ \emph{total}, adding a \emph{dead state} to $Q$,
-and adding rules to $R_2$ such that all possible previously undefined
-transitions go to the new dead state.
+As our working example for splitting a TDFTT, we use a transduction very
+similar to the one used for the BUFTT variant. Consider 
+$T = (\Sigma, \Delta, Q, R, q_0)$, where
+\begin{compactitem}
+\item $\Sigma = {a_2, b_1, c_0}$ 
+\item $\Delta = {f_2, g_1, h_1, i_0}$ 
+\item $Q = {q_a, q_odd, q_even}$ 
+\item $R = {$
+\begin{compactitem}
+\item $q_a[a[x_1,x_2]] \rightarrow f[q_odd[x_1],q_odd[x_1]]$
+\item $q_a[a[x_1,x_2]] \rightarrow f[q_odd[x_2],q_odd[x_2]]$
+\item $q_odd[b[x_1]] \rightarrow g[q_even[x_1]] $
+\item $q_odd[b[x_1]] \rightarrow h[q_even[x_1]] $
+\item $q_even[b[x_1]] \rightarrow g[q_odd[x_1]] $
+\item $q_even[b[x_1]] \rightarrow h[q_odd[x_1]] $
+\item $q_even[c] \rightarrow i$
+\end{compactitem}
+\item $q_0 = {q_a}$
+\end{compactitem}
 
+The language of $T$ differs from that of $B$ in the BUFTT example in
+several respects:
+\begin{compactitem}
+\item No guarantee exists about the two output subtrees being equal;
+indeed, every combination of different possible outputs will exist in the
+output tree set.
+\item There is no longer any requirement that the unused subtree must be of
+even height, instead two input subtrees of odd heights will result in the
+full outputs of both heights.
+\end{compactitem}
+
+Though this example showcases several traits that are unique to TDFTT, one
+notable feature is unused: that of starting off the processing of two
+copies of the same subtree using different states. It is an interesting
+property, but requires rather more complex examples.
+
+%TODO: work through example.

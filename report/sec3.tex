@@ -410,9 +410,9 @@ A top-down finite tree transducer (TDFTT) is a 5-tuple $T = (\Sigma,
 \item $\Delta$ is the (ranked) output alphabet,
 \item $Q$ is a set of states,
 \item $R$ is a set of rules on the form
-$$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,q_n[x_i_n]]$$ where
+$$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_{i,1}],\ldots,q_n[x_{i,n}]]$$ where
 $q_1,\ldots,q_n,q \in Q, s \in \Sigma_k, x_1,\ldots,x_k = X^k$ are variables,
-$c$ is a multicontext of rank $n$ over $\Delta$, and $x_i_1,\ldots,x_i_n \in X^k$
+$c$ is a multicontext of rank $n$ over $\Delta$, and $x_{i,1},\ldots,x_{i,n} \in X^k$
 %$t' \in T_{\Delta \cup Q \cup {x_1,\ldots,x_k}}$, where $Q$ is seen as a
 %ranked alphabet with $Q = Q_1$, ${x_1,\ldots, x_k}$ is a likewise ranked
 %alphabet $X$ with $X=X_0$, and elements $q \in Q$ and $x \in

@@ -50,16 +50,16 @@ Consider the example BUFTT $B = (\Sigma, \Delta, Q, R, F)$ where
 \begin{compactitem}
 \item $\Sigma = {a_2, b_1, c_0}$ 
 \item $\Delta = {f_2, g_1, h_1, i_0}$ 
-\item $Q = {q_a, q_even, q_odd}$ 
-\item $R = {$
+\item $Q = {q_a, q_{even}, q_{odd}}$ 
+\item $R = $
 \begin{compactitem}
-\item $c \rightarrow q_even[i]$
-\item $b[q_even[x_1]] \rightarrow q_odd[g[x_1]]$
-\item $b[q_even[x_1]] \rightarrow q_odd[h[x_1]]$
-\item $b[q_odd[x_1]] \rightarrow q_even[g[x_1]]$
-\item $b[q_odd[x_1]] \rightarrow q_even[h[x_1]]$
-\item $a[q_even[x_1],q_odd[x_2]] \rightarrow q_a[f[x_2,x_2]]$
-\item $a[q_odd[x_1],q_even[x_2]] \rightarrow q_a[f[x_1,x_1]] }$
+\item $c \rightarrow q_{even}[i]$
+\item $b[q_{even}[x_1]] \rightarrow q_{odd}[g[x_1]]$
+\item $b[q_{even}[x_1]] \rightarrow q_{odd}[h[x_1]]$
+\item $b[q_{odd}[x_1]] \rightarrow q_{even}[g[x_1]]$
+\item $b[q_{odd}[x_1]] \rightarrow q_{even}[h[x_1]]$
+\item $a[q_{even}[x_1],q_{odd}[x_2]] \rightarrow q_a[f[x_2,x_2]]$
+\item $a[q_{odd}[x_1],q_{even}[x_2]] \rightarrow q_a[f[x_1,x_1]] $
 \end{compactitem}
 \item $F = {q_a}$
 \end{compactitem}
@@ -131,8 +131,8 @@ interest.
 
 By applying only the relabeling $T_1$ to the input tree $a[b[b[c]],b[c]]$,
 we arrive at the intermediate tree set
-$$
-{ 
+$$\begin{aligned}
+{
 &d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
 &d_{f[x_2,x_2]}[d_{h[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
 &d_{f[x_2,x_2]}[d_{h[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
@@ -141,8 +141,9 @@ $$
 &d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{h[x_1]}[i]],\\
 &d_{f[x_2,x_2]}[d_{g[x_1]}[d_{h[x_1]}[i]],d_{g[x_1]}[i]],\\
 &d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{h[x_1]}[i]],\\
-&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]]
+&d_{f[x_2,x_2]}[d_{g[x_1]}[d_{g[x_1]}[i]],d_{g[x_1]}[i]]\\
 }
+\end{aligned}
 $$
 
 Obviously, all derivations starting with the rule
@@ -193,13 +194,13 @@ exactly $n$ times in the right-hand side of the rule.
 \end{itemize}
 
 $R_2$ is significantly more complex than $R_1$ in the bottom-up case. Suppose
-that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+that $$q[s[x_1,\ldots,x_k]] \rightarrow c[q_1[x_{i,1}],\ldots,q_l[x_{i,l}]]$$
 is a rule $r \in R$. The first step in the transformation is to move to a
 linear rule from $\Omega$ to $\Delta$ instead of from $\Sigma$.  In order
 to make the transformations obvious, we choose to number the variables used
 in $\Omega$ rules $x_1^1,x_1^2,\ldots,x_1^n,x_2^1,\ldots,x_k^n$ instead of
 the normal numbering. The linear rule thus becomes
-$$q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+$$q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_{i,1}],\ldots,q_l[x_{i,l}]]$$
 where each $x_i$ in the right-hand side that were previously $x_1$ now
 points to a different $x_1^j$, and likewise for $x_2$ and so on.
 
@@ -211,10 +212,10 @@ it is not hard to grasp intuitively that this is possible, defining the
 precise relationships takes more effort.
 
 Basically, each rule
-$$r_1 = q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_i_1],\ldots,q_l[x_i_l]]$$
+$$r_1 = q[s[x_1^1,x_1^2,\ldots,x_k^n]] \rightarrow c[q_1[x_{i,1}],\ldots,q_l[x_{i,l}]]$$
 becomes
-$$r_2 = s[q_j_1[x_1^1],q_j_2[x_1^2],\ldots,q_j_{k*n}[x_k^n]] \rightarrow q[c[x_i_1,\ldots,x_i_l]]$$
-where each $q_j_1$ in the left hand side matches the requisite state in the
+$$r_2 = s[q_{j,1}[x_1^1],q_{j,2}[x_1^2],\ldots,q_{j,{}k*n}[x_k^n]] \rightarrow q[c[x_{i,1},\ldots,x_{i,l}]]$$
+where each $q_{j,1}$ in the left hand side matches the requisite state in the
 previous right hand side. This obviously does not cover all cases, as $l$
 may be less than $k*n$, but we can introduce a new state $q_{nop}$, not in
 $F$, to handle the irrelevant subtrees. That is, for each $q_k[x_i^j]$
@@ -236,16 +237,16 @@ $T = (\Sigma, \Delta, Q, R, q_0)$, where
 \begin{compactitem}
 \item $\Sigma = {a_2, b_1, c_0}$ 
 \item $\Delta = {f_2, g_1, h_1, i_0}$ 
-\item $Q = {q_a, q_odd, q_even}$ 
+\item $Q = {q_a, q_{odd}, q_{even}}$ 
 \item $R = {$
 \begin{compactitem}
-\item $q_a[a[x_1,x_2]] \rightarrow f[q_odd[x_1],q_odd[x_1]]$
-\item $q_a[a[x_1,x_2]] \rightarrow f[q_odd[x_2],q_odd[x_2]]$
-\item $q_odd[b[x_1]] \rightarrow g[q_even[x_1]] $
-\item $q_odd[b[x_1]] \rightarrow h[q_even[x_1]] $
-\item $q_even[b[x_1]] \rightarrow g[q_odd[x_1]] $
-\item $q_even[b[x_1]] \rightarrow h[q_odd[x_1]] $
-\item $q_even[c] \rightarrow i$
+\item $q_a[a[x_1,x_2]] \rightarrow f[q_{odd}[x_1],q_{odd}[x_1]]$
+\item $q_a[a[x_1,x_2]] \rightarrow f[q_{odd}[x_2],q_{odd}[x_2]]$
+\item $q_{odd}[b[x_1]] \rightarrow g[q_{even}[x_1]] $
+\item $q_{odd}[b[x_1]] \rightarrow h[q_{even}[x_1]] $
+\item $q_{even}[b[x_1]] \rightarrow g[q_{odd}[x_1]] $
+\item $q_{even}[b[x_1]] \rightarrow h[q_{odd}[x_1]] $
+\item $q_{even}[c] \rightarrow i$
 \end{compactitem}
 \item $q_0 = {q_a}$
 \end{compactitem}
